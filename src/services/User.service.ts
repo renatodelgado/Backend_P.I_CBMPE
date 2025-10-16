@@ -1,5 +1,5 @@
 import { userRepository } from "../repositories/User.repository";
-import { User } from "../models/User";
+import { User } from "../entities/User";
 
 export class UserService {
   async create(username: string, password: string): Promise<User> {
