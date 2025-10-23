@@ -6,11 +6,17 @@ import { UnidadeOperacional } from "./UnidadeOperacional";
 @Unique(["matricula", "email"])
 export class User {
 
-  @PrimaryColumn({ unique: true })
-  matricula!: string;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
   @Column({nullable: false})
   nome!: string;
+
+  @Column({nullable: false})
+  matricula!: string;
+
+  @Column({ unique: true, nullable: false})
+  cpf!: string;
 
   @Column({nullable: false})
   patente!: string;
@@ -24,7 +30,7 @@ export class User {
   @Column({nullable: false})
   senha!: string;
 
-  @ManyToMany(() => UnidadeOperacional)
+  @ManyToOne(() => UnidadeOperacional)
   @JoinColumn({name: "unidade_operacional_id"})
   unidadeOperacional!: UnidadeOperacional;
 

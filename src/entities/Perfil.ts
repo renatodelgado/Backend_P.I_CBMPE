@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 
 @Entity("perfis")
 export class Perfil {
+  
   @PrimaryGeneratedColumn()
   id!: number;
 
