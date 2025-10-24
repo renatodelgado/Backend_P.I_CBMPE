@@ -11,11 +11,11 @@ export class EquipeUser {
     @PrimaryColumn()
     userId!: number;
 
-    @ManyToOne(() => Equipe)
+    @ManyToOne(() => Equipe, { nullable: false })
     @JoinColumn({ name: "equipeId" })
     equipe!: Equipe;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { nullable: false })
     @JoinColumn({ name: "userId" })
     user!: User;
 

@@ -1,23 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { UnidadeOperacional } from "./UnidadeOperacional";
 
-
-@Entity("equipes")
-export class Equipe {
+@Entity("viaturas")
+export class Viatura {
 
     @PrimaryGeneratedColumn()
     id!: number;
 
     @Column({ nullable: false })
-    nome!: string;
+    tipo!: string;
 
     @Column({ nullable: false })
-    lider!: string;
+    numero!: string;
+
+    @Column({ nullable: false })
+    placa!: string;
 
     @ManyToOne(() => UnidadeOperacional, { nullable: false })
     @JoinColumn({ name: "unidadeOperacionalId" })
     unidadeOperacional!: UnidadeOperacional;
-
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt!: Date;

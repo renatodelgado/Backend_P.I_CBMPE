@@ -1,24 +1,22 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { AIS } from "./AIS";
+import { User } from "./User";
 
-@Entity("regioes")
-export class Regiao {
-
+@Entity("telefones")
+export class Telefone {
+    
     @PrimaryGeneratedColumn()
     id!: number;
 
     @Column({ nullable: false })
-    nome!: string;
+    numero!: string;
 
-    @ManyToOne(() => AIS, { nullable: false })
-    @JoinColumn({ name: "aisId" })
-    ais!: AIS;
+    @ManyToOne(() => User, { nullable: false })
+    @JoinColumn({ name: "userId" })
+    user!: User;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt!: Date;
 
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt!: Date;
-
-
 }
