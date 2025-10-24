@@ -12,9 +12,9 @@ export class AIS {
     @Column({ nullable: false })
     descricao!: string;
 
-    @CreateDateColumn()
-    createDate?: Date;
+    @CreateDateColumn({ type: "timestamp" })
+    createdAt!: Date;
 
-    @UpdateDateColumn()
-    updateDate?: Date;
+    @UpdateDateColumn({ type: "timestamp" })
+    updatedAt!: Date;
 }

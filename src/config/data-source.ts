@@ -7,6 +7,14 @@ import { Perfil } from "./../entities/Perfil";
 import { UnidadeOperacional } from "../entities/UnidadeOperacional";
 import { Regiao } from "../entities/Regiao";
 import { AIS } from "../entities/AIS";
+import { Equipe } from "../entities/Equipe";
+import { EquipeUser } from "../entities/Equipe_User";
+import { Telefone } from "../entities/Telefone";
+import { Viatura } from "../entities/Viatura";
+import { Ocorrencia } from "../entities/Ocorrencia";
+import { Localizacao } from "../entities/Localizacao";
+import { EventoEspecial } from "../entities/EventoEspecial";
+import { NaturezaOcorrencia } from "../entities/NaturezaOcorrencia";
 
 dotenv.config();
 
@@ -17,7 +25,8 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [User, Perfil, UnidadeOperacional, Regiao, AIS],
+  entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
+    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia],
   synchronize: true, 
   logging: false,
 });

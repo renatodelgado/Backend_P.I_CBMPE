@@ -1,16 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinColumn, ManyToOne, PrimaryColumn, Unique } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne, Unique } from "typeorm";
 import { Perfil } from "./Perfil";
-import { UnidadeOperacional } from "./UnidadeOperacional";
+
 
 @Entity("users")
 @Unique(["matricula", "email"])
 export class User {
 
-  @PrimaryColumn({ unique: true })
-  matricula!: string;
+  @PrimaryGeneratedColumn()
+  id!: number;
 
   @Column({nullable: false})
   nome!: string;
+
+  @Column({nullable: false})
+  matricula!: string;
+
+  @Column({ unique: true, nullable: false})
+  cpf!: string;
 
   @Column({nullable: false})
   patente!: string;
@@ -24,18 +30,16 @@ export class User {
   @Column({nullable: false})
   senha!: string;
 
-  @ManyToMany(() => UnidadeOperacional)
-  @JoinColumn({name: "unidade_operacional_id"})
-  unidadeOperacional!: UnidadeOperacional;
 
-  @ManyToOne(() => Perfil)
-  @JoinColumn({name: "perfil_id"})
+
+  @ManyToOne(() => Perfil, { nullable: false })
+  @JoinColumn({name: "perfilId"})
   perfil!: Perfil;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt!: Date;
 
 }

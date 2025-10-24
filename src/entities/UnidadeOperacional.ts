@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { Regiao } from "./Regiao";
 
 
-@Entity("unidades_operacionais")
+@Entity("unidadesOperacionais")
 export class UnidadeOperacional {
 
   @PrimaryGeneratedColumn()
@@ -12,19 +12,19 @@ export class UnidadeOperacional {
   nome!: string;
 
   @Column({nullable: false})
-  tipo!: string;
+  pontoBase!: string;
 
   @Column({nullable: false})
   sigla!: string;
 
-  @ManyToOne(() => Regiao)
-  @JoinColumn({name: "regiao_id"})
+  @ManyToOne(() => Regiao, { nullable: false })
+  @JoinColumn({name: "regiaoId"})
   regiao!: Regiao;
 
-  @CreateDateColumn()
-  createDate?: Date;
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt!: Date;
 
-  @UpdateDateColumn()
-  updateDate?: Date;
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt!: Date;
 
 }

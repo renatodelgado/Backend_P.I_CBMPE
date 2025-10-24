@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 
 @Entity("perfis")
 export class Perfil {
+  
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -11,9 +12,9 @@ export class Perfil {
   @Column({nullable: true})
   descricao!: string;
 
-  @CreateDateColumn()
-  createDate?: Date;
-  
-  @UpdateDateColumn()
-  updateDate?: Date;
+  @CreateDateColumn({ type: "timestamp" })
+  createdAt!: Date;
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updatedAt!: Date;
 }   
