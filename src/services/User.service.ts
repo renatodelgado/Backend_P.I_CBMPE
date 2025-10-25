@@ -2,7 +2,7 @@ import { userRepository } from "../repositories/User.repository";
 import { User } from "../entities/User";
 
 export class UserService {
-  async create(userdata: Omit<User, "matricula">): Promise<User> {
+  async create(userdata: Partial<User>): Promise<User> {
     const lastUser = await userRepository.
       createQueryBuilder("user")
       .orderBy("user.matricula", "DESC")
