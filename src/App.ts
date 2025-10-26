@@ -7,10 +7,9 @@ import { Perfil } from "./entities/Perfil";
 export const app = express();
 
 app.use(cors(
-  { origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"] }
+  { origin: "*" }
 ));
+
 app.use(express.json());
 app.use("/users", userRoutes);
 
