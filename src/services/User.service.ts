@@ -38,8 +38,10 @@ export class UserService {
       patente: u.patente,
       funcao: u.funcao,
       email: u.email,
-      perfilId: u.perfil?.id,
-      unidadeOperacionalId: u.unidadeOperacional?.id,
+      perfil: { id: u.perfil?.id, nome: u.perfil?.nome },
+      unidadeOperacional: { id: u.unidadeOperacional?.id, nome: u.unidadeOperacional?.nome },
+      status: u.status,
+      ultimoAcesso: u.ultimoAcesso,
     }));
   }
 
