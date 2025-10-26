@@ -6,6 +6,11 @@ import { Perfil } from "./entities/Perfil";
 import { UnidadeOperacional } from "./entities/UnidadeOperacional";
 import { unidadeOperacionalRoutes } from "./routes/UnidadeOperacional.routes";
 import { perfilRoutes } from "./routes/Perfil.routes";
+import { aisRoutes } from "./routes/AIS.routes";
+import { regiaoRoutes } from "./routes/Regiao.routes";
+import { viaturaRoutes } from "./routes/Viatura.routes";
+import { naturezaOcorrenciaRoutes } from "./routes/NaturezaOcorrencia.routes";
+import ocorrenciaRoutes from "./routes/Ocorrencia.routes";
 
 export const app = express();
 
@@ -26,3 +31,13 @@ app.post("/teste", (req, res) => {
 app.use("/perfis", perfilRoutes);
 
 app.use("/unidadesoperacionais", unidadeOperacionalRoutes);
+
+app.use("/ais", aisRoutes);
+
+app.use("/regioes", regiaoRoutes);
+
+app.use("/viaturas", viaturaRoutes);
+
+app.use("/naturezasocorrencias", naturezaOcorrenciaRoutes);
+
+app.use ("/ocorrencias", ocorrenciaRoutes);
