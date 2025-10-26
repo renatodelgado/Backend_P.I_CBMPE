@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Regiao } from "./Regiao";
-import { AIS } from "./AIS";
 
 
 @Entity("unidadesOperacionais")
@@ -18,9 +17,9 @@ export class UnidadeOperacional {
   @Column({nullable: false})
   sigla!: string;
 
-  @ManyToOne(() => AIS, { nullable: false })
-  @JoinColumn({name: "aisId"})
-  ais!: AIS;
+  @ManyToOne(() => Regiao, { nullable: false })
+  @JoinColumn({name: "RegiaoId"})
+  regiao!: Regiao;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
