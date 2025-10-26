@@ -4,6 +4,8 @@ import cors from "cors";
 import { AppDataSource } from "./config/data-source";
 import { Perfil } from "./entities/Perfil";
 import { UnidadeOperacional } from "./entities/UnidadeOperacional";
+import { unidadeOperacionalRoutes } from "./routes/UnidadeOperacional.routes";
+import { perfilRoutes } from "./routes/Perfil.routes";
 
 export const app = express();
 
@@ -21,12 +23,6 @@ app.post("/teste", (req, res) => {
   res.json({ recebido: req.body });
 });
 
-app.get("/perfis", async (req, res) => {
-  const perfis = await AppDataSource.getRepository(Perfil).find();
-  res.json(perfis);
-});
+app.use("/perfis", perfilRoutes);
 
-app.get("/unidadesoperacionais", async (req, res) => {
-  const unidadesoperacionais = await AppDataSource.getRepository(UnidadeOperacional).find();
-  res.json(unidadesoperacionais);
-});
+app.use("/unidadesoperacionais", unidadeOperacionalRoutes);
