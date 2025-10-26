@@ -4,6 +4,14 @@ import cors from "cors";
 import { AppDataSource } from "./config/data-source";
 import { Perfil } from "./entities/Perfil";
 import { UnidadeOperacional } from "./entities/UnidadeOperacional";
+import { unidadeOperacionalRoutes } from "./routes/UnidadeOperacional.routes";
+import { perfilRoutes } from "./routes/Perfil.routes";
+import { aisRoutes } from "./routes/AIS.routes";
+import { regiaoRoutes } from "./routes/Regiao.routes";
+import { viaturaRoutes } from "./routes/Viatura.routes";
+import { naturezaOcorrenciaRoutes } from "./routes/NaturezaOcorrencia.routes";
+import ocorrenciaRoutes from "./routes/Ocorrencia.routes";
+import { geocodeRouter } from "./routes/geocode.routes";
 
 export const app = express();
 
@@ -21,12 +29,18 @@ app.post("/teste", (req, res) => {
   res.json({ recebido: req.body });
 });
 
-app.get("/perfis", async (req, res) => {
-  const perfis = await AppDataSource.getRepository(Perfil).find();
-  res.json(perfis);
-});
+app.use("/perfis", perfilRoutes);
 
-app.get("/unidadesoperacionais", async (req, res) => {
-  const unidadesoperacionais = await AppDataSource.getRepository(UnidadeOperacional).find();
-  res.json(unidadesoperacionais);
-});
+app.use("/unidadesoperacionais", unidadeOperacionalRoutes);
+
+app.use("/ais", aisRoutes);
+
+app.use("/regioes", regiaoRoutes);
+
+app.use("/viaturas", viaturaRoutes);
+
+app.use("/naturezasocorrencias", naturezaOcorrenciaRoutes);
+
+app.use ("/ocorrencias", ocorrenciaRoutes);
+
+app.use("/api", geocodeRouter);
