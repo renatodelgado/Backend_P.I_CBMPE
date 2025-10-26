@@ -3,31 +3,64 @@ import { User } from "../entities/User";
 
 export class UserService {
   async create(userdata: Partial<User>): Promise<User> {
-    const lastUser = await userRepository.
-      createQueryBuilder("user")
+    const lastUser = await userRepository
+      .createQueryBuilder("user")
       .orderBy("user.matricula", "DESC")
       .getOne();
 
-      const nextNumber = lastUser
-         ? Number(lastUser.matricula.replace(/\D/g, '')) + 1
-          : 1;
+    const nextNumber = lastUser
+      ? Number(lastUser.matricula.replace(/\D/g, '')) + 1
+      : 1;
 
-          const prefix = "CBMPE";
+    const prefix = "CBMPE";
 
-          const matricula = `${prefix}${nextNumber.toString().padStart(5, '0')}`;
+    const matricula = `${prefix}${nextNumber.toString().padStart(5, '0')}`;
 
-          const newUser = userRepository.create({
-            ...userdata,
-            matricula,
-          });
-          return await userRepository.save(newUser);
+    const newUser = userRepository.create({
+      ...userdata,
+      matricula,
+    });
+
+    return await userRepository.save(newUser);
   }
 
-  async findAll(): Promise<User[]> {
-    return await userRepository.find();
+  async findAll(): Promise<any[]> {
+    const users = await userRepository.find({
+      relations: ["perfil", "unidadeOperacional"], // 🔹 inclui relações
+    });
+
+    // Retornar apenas IDs das relações
+    return users.map(u => ({
+      id: u.id,
+      nome: u.nome,
+      matricula: u.matricula,
+      cpf: u.cpf,
+      patente: u.patente,
+      funcao: u.funcao,
+      email: u.email,
+      perfilId: u.perfil?.id,
+      unidadeOperacionalId: u.unidadeOperacional?.id,
+    }));
   }
 
-  async findByMatricula(matricula: string): Promise<User | null> {
-    return await userRepository.findOneBy({ matricula });
+  async findByMatricula(matricula: string): Promise<any | null> {
+    const user = await userRepository.findOne({
+      where: { matricula },
+      relations: ["perfil", "unidadeOperacional"], // 🔹 inclui relações
+    });
+
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      nome: user.nome,
+      matricula: user.matricula,
+      cpf: user.cpf,
+      patente: user.patente,
+      funcao: user.funcao,
+      email: user.email,
+      perfilId: user.perfil?.id,
+      unidadeOperacionalId: user.unidadeOperacional?.id,
+    };
   }
 }
