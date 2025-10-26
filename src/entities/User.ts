@@ -1,6 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne, Unique } from "typeorm";
+import { 
+  Entity, 
+  PrimaryGeneratedColumn, 
+  Column, 
+  CreateDateColumn, 
+  UpdateDateColumn, 
+  JoinColumn, 
+  ManyToOne, 
+  Unique 
+} from "typeorm";
 import { Perfil } from "./Perfil";
-
+import { UnidadeOperacional } from "./UnidadeOperacional";
 
 @Entity("users")
 @Unique(["matricula", "email"])
@@ -9,37 +18,44 @@ export class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   nome!: string;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   matricula!: string;
 
-  @Column({ unique: true, nullable: false})
+  @Column({ unique: true, nullable: false })
   cpf!: string;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   patente!: string;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   funcao!: string;
 
-  @Column({unique: true, nullable: false})
+  @Column({ unique: true, nullable: false })
   email!: string;
 
-  @Column({nullable: false})
+  @Column({ nullable: false })
   senha!: string;
 
-
-
   @ManyToOne(() => Perfil, { nullable: false })
-  @JoinColumn({name: "perfilId"})
+  @JoinColumn({ name: "perfilId" })
   perfil!: Perfil;
+
+  @ManyToOne(() => UnidadeOperacional, { nullable: false })
+  @JoinColumn({ name: "unidadeOperacionalId" })
+  unidadeOperacional!: UnidadeOperacional;
+
+  @Column({ type: "boolean", default: true })
+  status!: boolean; // true = ativo, false = inativo
+
+  @Column({ type: "timestamp", nullable: true })
+  ultimoAcesso?: Date;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 
   @UpdateDateColumn({ type: "timestamp" })
   updatedAt!: Date;
-
 }

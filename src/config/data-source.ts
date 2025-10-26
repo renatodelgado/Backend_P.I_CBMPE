@@ -28,6 +28,6 @@ export const AppDataSource = new DataSource({
   entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
     EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia],
   migrations: ["dist/migrations/*.js"],
-  synchronize: false, 
+  synchronize: true, 
   logging: false,
 });

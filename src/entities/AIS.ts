@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Regiao } from "./Regiao";
 
 @Entity("ais")
 export class AIS {
@@ -11,6 +12,10 @@ export class AIS {
 
     @Column({ nullable: false })
     descricao!: string;
+
+    @ManyToOne(() => Regiao, { nullable: false })
+    @JoinColumn({ name: "regiaoId" })
+    regiao!: Regiao;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt!: Date;
