@@ -77,11 +77,14 @@ export class OcorrenciaService {
     async findAll() {
         return await ocorrenciaRepository.find({
             relations: [
-                "unidadeOperacional",
-                "usuario",
-                "eventoEspecial",
+                "naturezaOcorrencia",
+                "grupoOcorrencia",
+                "subgrupoOcorrencia",
+                "viatura",
                 "localizacao",
-                "naturezaOcorrencia"
+                "usuario",
+                "unidadeOperacional",
+                "anexos"
             ],
             order: { dataHoraChamada: "DESC" }
         });
