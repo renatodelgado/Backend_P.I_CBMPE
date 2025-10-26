@@ -8,7 +8,7 @@ import { UnidadeOperacional } from "./entities/UnidadeOperacional";
 export const app = express();
 
 app.use(cors(
-  { origin: "http://projetochama.netlify.app/",
+  { origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"] }
 ));
