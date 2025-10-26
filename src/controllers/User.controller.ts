@@ -19,6 +19,7 @@ export class UserController {
         email,
         senha,
         perfil,
+        unidadeOperacional,
         createdAt: new Date(),
         updatedAt: new Date(),
       });

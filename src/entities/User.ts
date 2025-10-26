@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, JoinColumn, ManyToOne, Unique } from "typeorm";
 import { Perfil } from "./Perfil";
+import { UnidadeOperacional } from "./UnidadeOperacional";
 
 
 @Entity("users")
@@ -30,11 +31,13 @@ export class User {
   @Column({nullable: false})
   senha!: string;
 
-
-
   @ManyToOne(() => Perfil, { nullable: false })
   @JoinColumn({name: "perfilId"})
   perfil!: Perfil;
+
+  @ManyToOne(() => UnidadeOperacional, { nullable: false })
+  @JoinColumn({name: "unidadeOperacionalId"})
+  unidadeOperacional!: UnidadeOperacional;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;

@@ -7,7 +7,9 @@ import { Perfil } from "./entities/Perfil";
 export const app = express();
 
 app.use(cors(
-  { origin: "*" }
+  { origin: "http://projetochama.netlify.app/",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"] }
 ));
 
 app.use(express.json());
