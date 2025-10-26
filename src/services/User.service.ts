@@ -46,7 +46,7 @@ export class UserService {
   async findByMatricula(matricula: string): Promise<any | null> {
     const user = await userRepository.findOne({
       where: { matricula },
-      relations: ["perfil", "unidadeOperacional"], // 🔹 inclui relações
+      relations: ["perfil", "unidadeOperacional"],
     });
 
     if (!user) return null;
@@ -55,12 +55,11 @@ export class UserService {
       id: user.id,
       nome: user.nome,
       matricula: user.matricula,
-      cpf: user.cpf,
-      patente: user.patente,
-      funcao: user.funcao,
       email: user.email,
-      perfilId: user.perfil?.id,
-      unidadeOperacionalId: user.unidadeOperacional?.id,
+      perfil: { id: user.perfil?.id, nome: user.perfil?.nome },
+      unidadeOperacional: { id: user.unidadeOperacional?.id, nome: user.unidadeOperacional?.nome },
+      status: user.status ?? "Ativo",
+      ultimoAcesso: user.ultimoAcesso ?? "-",
     };
   }
 }
