@@ -6,7 +6,7 @@ import { seedPerfis } from "./config/seedPerfis";
 dotenv.config();
 
 AppDataSource.initialize()
-  .then(async() => {
+  .then(async () => {
     console.log("📦 Conectado ao banco MySQL!");
     await seedPerfis();
     console.log("🌱 Perfis fixos verificados/criados com sucesso.");
