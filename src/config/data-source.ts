@@ -15,6 +15,14 @@ import { Ocorrencia } from "../entities/Ocorrencia";
 import { Localizacao } from "../entities/Localizacao";
 import { EventoEspecial } from "../entities/EventoEspecial";
 import { NaturezaOcorrencia } from "../entities/NaturezaOcorrencia";
+import { GrupoOcorrencia } from "../entities/GrupoOcorrencia";
+import { SubgrupoOcorrencia } from "../entities/SubgrupoOcorrencia";
+import { LogAuditoria } from "../entities/LogAuditoria";
+import { Anexo } from "../entities/Anexo";
+import { Vitima } from "../entities/Vitima";
+import { VitimaLesao } from "../entities/Vitima_Lesao";
+import { Lesao } from "../entities/Lesao";
+
 
 dotenv.config();
 
@@ -26,7 +34,8 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
   entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
-    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia],
+    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
+    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, VitimaLesao, Lesao],
   migrations: ["dist/migrations/*.js"],
   synchronize: true, 
   logging: false,
