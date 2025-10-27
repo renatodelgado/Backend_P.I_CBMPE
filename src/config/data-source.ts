@@ -36,6 +36,6 @@ export const AppDataSource = new DataSource({
     EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
     GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao],
   migrations: ["dist/migrations/*.js"],
-  synchronize: false, 
+  synchronize: true, 
   logging: false,
 });
