@@ -45,8 +45,8 @@ app.use("/naturezasocorrencias", naturezaOcorrenciaRoutes);
 
 app.use ("/ocorrencias", ocorrenciaRoutes);
 
-app.use ("/grupoocorrencias", grupoOcorrenciaRoutes);
+app.use ("/gruposocorrencias", grupoOcorrenciaRoutes);
 
-app.use ("/subgrupoocorrencias", subgrupoOcorrenciaRoutes);
+app.use ("/subgruposocorrencias", subgrupoOcorrenciaRoutes);
 
 app.use("/api", geocodeRouter);
