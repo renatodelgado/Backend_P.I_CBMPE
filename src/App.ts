@@ -12,7 +12,6 @@ import { viaturaRoutes } from "./routes/Viatura.routes";
 import { naturezaOcorrenciaRoutes } from "./routes/NaturezaOcorrencia.routes";
 import { ocorrenciaRoutes } from "./routes/Ocorrencia.routes";
 import { geocodeRouter } from "./routes/geocode.routes";
-import { authRoutes } from "./routes/Auth.routes";
 import { grupoOcorrenciaRoutes } from "./routes/GrupoOcorrencia.routes";
 import { subgrupoOcorrenciaRoutes } from "./routes/SubgrupoOcorrencia.routes";
 
@@ -51,5 +50,3 @@ app.use ("/gruposocorrencias", grupoOcorrenciaRoutes);
 app.use ("/subgruposocorrencias", subgrupoOcorrenciaRoutes);
 
 app.use("/api", geocodeRouter);
-
-app.use("/auth", authRoutes);
