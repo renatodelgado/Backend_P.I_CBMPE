@@ -76,4 +76,6 @@ export class Ocorrencia {
 
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt!: Date;
+    SubgrupoOcorrencia: SubgrupoOcorrencia | null = new SubgrupoOcorrencia;
+    Viatura: Viatura | null = new Viatura;
 }
