@@ -8,9 +8,6 @@ export class Vitima {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Column({ type: "boolean" })
-    temVitima!: boolean;
-
     @Column({ name: "cpf_vitima", nullable: true })
     cpfVitima?: string;
 
@@ -22,9 +19,6 @@ export class Vitima {
 
     @Column({ nullable: true })
     sexo?: string;
-
-    @Column({ nullable: false })
-    condicaoVitima?: string;
 
     @Column({ nullable: false })
     tipoAtendimento?: string;
