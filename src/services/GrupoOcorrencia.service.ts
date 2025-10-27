@@ -12,7 +12,7 @@ export class GrupoOcorrenciaService {
 
     async findById(id: number): Promise<GrupoOcorrencia | null> {
         return await GrupoOcorrenciaRepository.findOne(
-            { where: { id } }
+            { where: { id }, relations: ['naturezaOcorrencia'] }
         );
     }
 
