@@ -12,6 +12,7 @@ import { viaturaRoutes } from "./routes/Viatura.routes";
 import { naturezaOcorrenciaRoutes } from "./routes/NaturezaOcorrencia.routes";
 import ocorrenciaRoutes from "./routes/Ocorrencia.routes";
 import { geocodeRouter } from "./routes/geocode.routes";
+import { authRoutes } from "./routes/Auth.routes";
 
 export const app = express();
 
@@ -44,3 +45,5 @@ app.use("/naturezasocorrencias", naturezaOcorrenciaRoutes);
 app.use ("/ocorrencias", ocorrenciaRoutes);
 
 app.use("/api", geocodeRouter);
+
+app.use("/auth", authRoutes);
