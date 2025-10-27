@@ -4,6 +4,10 @@ import { User } from "./User";
 import { EventoEspecial } from "./EventoEspecial";
 import { Localizacao } from "./Localizacao";
 import { NaturezaOcorrencia } from "./NaturezaOcorrencia";
+import { GrupoOcorrencia } from "./GrupoOcorrencia";
+import { SubgrupoOcorrencia } from "./SubgrupoOcorrencia";
+import { Viatura } from "./Viatura";
+import { Anexo } from "./Anexo";
 
 @Entity("ocorrencias")
 export class Ocorrencia {
@@ -52,9 +56,26 @@ export class Ocorrencia {
     @JoinColumn({ name: "naturezaOcorrenciaId" })
     naturezaOcorrencia!: NaturezaOcorrencia;
 
+    @ManyToOne(() => GrupoOcorrencia, { nullable: false })
+    @JoinColumn({ name: "grupoOcorrenciaId" })
+    grupoOcorrencia!: GrupoOcorrencia;
+
+    @ManyToOne(() => SubgrupoOcorrencia, { nullable: true })
+    @JoinColumn({ name: "subgrupoOcorrenciaId" })
+    subgrupoOcorrencia!: SubgrupoOcorrencia;
+
+    @ManyToOne(() => Viatura, { nullable: true })
+    @JoinColumn({ name: "viaturaId" })
+    viatura!: Viatura;
+
+    @OneToMany(() => Anexo, (anexo) => anexo.ocorrencia, { cascade: true })
+    anexos!: Anexo[];
+
     @CreateDateColumn({ type: "timestamp" })
     createdAt!: Date;
 
     @UpdateDateColumn({ type: "timestamp" })
     updatedAt!: Date;
+    SubgrupoOcorrencia: SubgrupoOcorrencia | null = new SubgrupoOcorrencia;
+    Viatura: Viatura | null = new Viatura;
 }
