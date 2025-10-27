@@ -1,6 +1,7 @@
 import { VitimaRepository } from "../repositories/Vitima.repository";
 import { Vitima } from "../entities/Vitima";
 import { ocorrenciaRepository } from "../repositories/Ocorrencia.repository";
+import { LesaoRepository } from "../repositories/Lesao.repository";
 
 export class VitimaService {
 
@@ -31,18 +32,21 @@ export class VitimaService {
 		const ocorrencia = await ocorrenciaRepository.findOneBy({ id: data.ocorrenciaId });
 		if (!ocorrencia) throw new Error("Ocorrência não encontrada");
 
+		const lesao = await LesaoRepository.findOneBy({ id: data.lesaoId });
+		if (!lesao) throw new Error("Lesão não encontrada");
+
 		const vitimaToSave: any = {
 			temVitima: data.temVitima,
 			cpfVitima: data.cpfVitima ?? null,
 			nome: data.nome,
 			idade: data.idade ?? null,
 			sexo: data.sexo ?? null,
-			condicaoVitima: data.condicaoVitima,
 			tipoAtendimento: data.tipoAtendimento,
 			observacoes: data.observacoes ?? null,
 			etnia: data.etnia ?? null,
 			destinoVitima: data.destinoVitima ?? null,
-			ocorrencia
+			ocorrencia,
+            lesao
 		};
 
 		return await VitimaRepository.save(vitimaToSave);
