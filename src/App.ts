@@ -14,6 +14,7 @@ import { ocorrenciaRoutes } from "./routes/Ocorrencia.routes";
 import { geocodeRouter } from "./routes/geocode.routes";
 import { grupoOcorrenciaRoutes } from "./routes/GrupoOcorrencia.routes";
 import { subgrupoOcorrenciaRoutes } from "./routes/SubgrupoOcorrencia.routes";
+import { authRoutes } from "./routes/Auth.routes";
 
 export const app = express();
 
@@ -50,3 +51,5 @@ app.use ("/gruposocorrencias", grupoOcorrenciaRoutes);
 app.use ("/subgruposocorrencias", subgrupoOcorrenciaRoutes);
 
 app.use("/api", geocodeRouter);
+
+app.use("/auth", authRoutes);
