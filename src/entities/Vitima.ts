@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import { Ocorrencia } from "./Ocorrencia";
+import { Lesao } from "./Lesao";
 
 @Entity({ name: "vitima" })
 export class Vitima {
@@ -40,6 +41,10 @@ export class Vitima {
     @ManyToOne(() => Ocorrencia, {nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "ocorrenciaId" })
     ocorrencia!: Ocorrencia;
+
+    @ManyToOne(() => Lesao, { nullable: false, onDelete: "CASCADE" })
+    @JoinColumn({ name: "lesaoId" })
+    lesao!: Lesao;
     
     @CreateDateColumn({ name: "dataCriacao" })
     dataCriacao!: Date;

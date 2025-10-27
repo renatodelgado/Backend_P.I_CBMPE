@@ -20,7 +20,6 @@ import { SubgrupoOcorrencia } from "../entities/SubgrupoOcorrencia";
 import { LogAuditoria } from "../entities/LogAuditoria";
 import { Anexo } from "../entities/Anexo";
 import { Vitima } from "../entities/Vitima";
-import { VitimaLesao } from "../entities/Vitima_Lesao";
 import { Lesao } from "../entities/Lesao";
 
 
@@ -35,7 +34,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
     EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
-    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, VitimaLesao, Lesao],
+    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao],
   migrations: ["dist/migrations/*.js"],
   synchronize: false, 
   logging: false,
