@@ -2,12 +2,18 @@ import { GrupoOcorrenciaRepository } from "../repositories/GrupoOcorrencia.repos
 import { GrupoOcorrencia } from "../entities/GrupoOcorrencia";
 
 export class GrupoOcorrenciaService {
+    
+    
     async findAll(): Promise<GrupoOcorrencia[]> {
-        return await GrupoOcorrenciaRepository.find();
+        return await GrupoOcorrenciaRepository.find(
+            { relations: ['naturezaOcorrencia'] }
+        );
     }
 
     async findById(id: number): Promise<GrupoOcorrencia | null> {
-        return await GrupoOcorrenciaRepository.findOneBy({ id });
+        return await GrupoOcorrenciaRepository.findOne(
+            { where: { id } }
+        );
     }
 
 };
