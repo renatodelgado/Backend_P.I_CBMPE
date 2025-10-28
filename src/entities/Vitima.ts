@@ -20,7 +20,7 @@ export class Vitima {
     @Column({ nullable: true })
     sexo?: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     tipoAtendimento?: string;
 
     @Column({ type: "text", nullable: true })

@@ -16,6 +16,7 @@ import { grupoOcorrenciaRoutes } from "./routes/GrupoOcorrencia.routes";
 import { subgrupoOcorrenciaRoutes } from "./routes/SubgrupoOcorrencia.routes";
 import { authRoutes } from "./routes/Auth.routes";
 import { lesaoRoutes } from "./routes/Lesao.routes";
+import { vitimaRoutes } from "./routes/Vitima.routes";
 
 export const app = express();
 
@@ -52,6 +53,8 @@ app.use ("/gruposocorrencias", grupoOcorrenciaRoutes);
 app.use ("/subgruposocorrencias", subgrupoOcorrenciaRoutes);
 
 app.use ("/lesoes", lesaoRoutes);
+
+app.use ("/vitimas", vitimaRoutes); 
 
 app.use("/api", geocodeRouter);
 

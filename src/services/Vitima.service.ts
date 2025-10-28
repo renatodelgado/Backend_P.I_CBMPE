@@ -8,20 +8,9 @@ export class VitimaService {
 	// Cria uma vítima. `data` pode conter `ocorrenciaId` (opcional) para relacionar.
 	async create(data: any) {
 		// validações mínimas
-		if (typeof data.temVitima !== "boolean") {
-			throw new Error("campo 'temVitima' é obrigatório e deve ser booleano");
-		}
 
 		if (!data.nome) {
 			throw new Error("campo 'nome' é obrigatório");
-		}
-
-		if (!data.condicaoVitima) {
-			throw new Error("campo 'condicaoVitima' é obrigatório");
-		}
-
-		if (!data.tipoAtendimento) {
-			throw new Error("campo 'tipoAtendimento' é obrigatório");
 		}
 
 		// ocorrência é obrigatória para criar vítima
@@ -36,12 +25,11 @@ export class VitimaService {
 		if (!lesao) throw new Error("Lesão não encontrada");
 
 		const vitimaToSave: any = {
-			temVitima: data.temVitima,
 			cpfVitima: data.cpfVitima ?? null,
 			nome: data.nome,
 			idade: data.idade ?? null,
 			sexo: data.sexo ?? null,
-			tipoAtendimento: data.tipoAtendimento,
+			tipoAtendimento: data.tipoAtendimento ?? null,
 			observacoes: data.observacoes ?? null,
 			etnia: data.etnia ?? null,
 			destinoVitima: data.destinoVitima ?? null,
@@ -51,8 +39,6 @@ export class VitimaService {
 
 		return await VitimaRepository.save(vitimaToSave);
 	}
-
-
 
 	// Retorna todas as vítimas
 	async findAll() {
