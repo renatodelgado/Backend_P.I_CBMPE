@@ -10,7 +10,5 @@ export class Lesao {
   @Column({ name: "tipo_lesao", nullable: false })
   tipoLesao!: string;
 
-  @Column({ type: "text", nullable: true })
-  descricao?: string;
 
 }
