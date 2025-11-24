@@ -21,6 +21,7 @@ import { LogAuditoria } from "../entities/LogAuditoria";
 import { Anexo } from "../entities/Anexo";
 import { Vitima } from "../entities/Vitima";
 import { Lesao } from "../entities/Lesao";
+import { LogConflito } from "../entities/LogConflito";
 
 
 dotenv.config();
@@ -34,7 +35,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
     EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
-    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao],
+    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao, LogConflito],
   migrations: ["dist/migrations/*.js"],
   synchronize: true, 
   logging: false,
