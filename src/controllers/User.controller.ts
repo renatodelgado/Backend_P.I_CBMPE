@@ -6,37 +6,38 @@ import { UnidadeOperacional } from "../entities/UnidadeOperacional";
 const userService = new UserService();
 
 export class UserController {
-
-
   async create(req: Request, res: Response) {
-  console.log("📩 Body recebido:", req.body);
-  try {
-    const { nome, matricula, cpf, patente, funcao, email, senha, unidadeOperacionalId, perfilId } = req.body;
+    try {
+      const { nome, patente, funcao, email, senha, unidadeOperacional, perfil } = req.body;
 
-    if (!nome || !matricula || !cpf || !patente || !funcao || !email || !senha || !unidadeOperacionalId || !perfilId) {
-      return res.status(400).json({ message: "Preencha todos os campos obrigatórios." });
+      if (!nome || !patente || !funcao || !email || !senha || !unidadeOperacional || !perfil) {
+        return res.status(400).json({ message: "Preencha todos os campos obrigatórios." });
+      }
+
+      const auditContext = {
+        request_id: (req as any).requestId,
+        actor_ip: req.ip || req.socket.remoteAddress,
+        actor_user_agent: req.headers['user-agent'] as string | undefined,
+      };
+
+      const user = await userService.create({
+        nome,
+        patente,
+        funcao,
+        email,
+        senha,
+        unidadeOperacional,
+        perfil,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any, auditContext);
+
+      return res.status(201).json(user);
+    } catch (error) {
+      console.error("Erro ao criar usuário:", error);
+      return res.status(500).json({ message: "Erro interno ao criar usuário." });
     }
-
-    // Cria o usuário com os objetos relacionados
-    const user = await userService.create({
-      nome,
-      matricula,
-      cpf,
-      patente,
-      funcao,
-      email,
-      senha,
-      perfil: { id: Number(perfilId) } as Perfil,
-      unidadeOperacional: { id: Number(unidadeOperacionalId) } as UnidadeOperacional, 
-    });
-
-    return res.status(201).json(user);
-  } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-    const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-    return res.status(500).json({ message: "Erro interno ao criar usuário.", detail: errorMessage });
   }
-}
 
   async findAll(req: Request, res: Response) {
     try {
@@ -52,9 +53,7 @@ export class UserController {
     try {
       const { matricula } = req.params;
       const user = await userService.findByMatricula(matricula);
-      if (!user) {
-        return res.status(404).json({ message: "Usuário não encontrado." });
-      }
+      if (!user) return res.status(404).json({ message: "Usuário não encontrado." });
       return res.json(user);
     } catch (error) {
       console.error("Erro ao buscar usuário:", error);
@@ -75,7 +74,7 @@ export class UserController {
       return res.status(500).json({ message: "Erro interno ao buscar usuário." });
     }
   }
-}
+
   async updatePassword(req: Request, res: Response) {
     try {
       const { id } = req.params;

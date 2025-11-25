@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
 import { DataSource } from "typeorm";
-
 import { User } from "../entities/User";
 import { Perfil } from "../entities/Perfil";
 import { UnidadeOperacional } from "../entities/UnidadeOperacional";
@@ -23,7 +22,9 @@ import { Vitima } from "../entities/Vitima";
 import { Lesao } from "../entities/Lesao";
 import { OcorrenciaUser } from "../entities/Ocorrencia_User";
 import { LogConflito } from "../entities/LogConflito";
+import { AuditLog } from "../entities/AuditLog";
 
+dotenv.config();
 
 
 
@@ -34,7 +35,6 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-
   entities: [
     User,
     Perfil,
@@ -55,17 +55,11 @@ export const AppDataSource = new DataSource({
     Anexo,
     Vitima,
     Lesao,
-    OcorrenciaUser, // <<<<<<<<<<<< ESSA É A IMPORTANTE
+    OcorrenciaUser,
+    LogConflito,
+    AuditLog
   ],
-
-  migrations: ["dist/migrations/*.ts"],
-  synchronize: false, // <<<<<< OBRIGATÓRIO
-  entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
-    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
-    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao, LogConflito],
   migrations: ["dist/migrations/*.js"],
   synchronize: false,
-  migrationsRun: true,
-
   logging: false,
 });
