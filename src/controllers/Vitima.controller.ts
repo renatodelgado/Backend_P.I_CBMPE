@@ -15,9 +15,9 @@ export class VitimaController {
 		return res.json(vitimas);
 	}
 
-	async findByOcorrenciaId(req: Request, res: Response) {
+	async findVitimasByOcorrenciaId(req: Request, res: Response) {
 		const { ocorrenciaId } = req.params;
-		const vitimas = await vitimaService.findByOcorrenciaId(Number(ocorrenciaId));
+		const vitimas = await vitimaService.findVitimasByOcorrenciaId(Number(ocorrenciaId));
 		return res.json(vitimas);
 	}
 }

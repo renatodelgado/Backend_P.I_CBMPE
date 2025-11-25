@@ -38,6 +38,19 @@ export class OcorrenciaController {
         }
     }
 
+    // Buscar ocorrências por ID do usuário
+    async findByUsuarioId(req: Request, res: Response) {
+        try {
+            const { usuarioId } = req.params;
+            const ocorrencias = await ocorrenciaService.findByUsuarioId(Number(usuarioId));
+            res.status(200).json(ocorrencias);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(400).json({ message });
+        }
+    }
+
+}
     async updateStatus(req: Request, res: Response) {
         try {
             const { id } = req.params;

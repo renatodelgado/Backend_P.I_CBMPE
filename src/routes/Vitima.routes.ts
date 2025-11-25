@@ -6,6 +6,6 @@ const vitimaRoutes = Router();
 const controller = new VitimaController();
 vitimaRoutes.post("/", controller.create);
 vitimaRoutes.get("/", controller.findAll);
-vitimaRoutes.get("/ocorrencia/:ocorrenciaId", controller.findByOcorrenciaId);
+vitimaRoutes.get("/:ocorrenciaId", controller.findVitimasByOcorrenciaId);
 
 export { vitimaRoutes };

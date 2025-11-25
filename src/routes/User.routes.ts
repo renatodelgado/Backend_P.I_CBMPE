@@ -8,6 +8,8 @@ const controller = new UserController();
 
 userRoutes.post("/", controller.create);
 userRoutes.get("/", controller.findAll);
+userRoutes.get("/matricula/:matricula", controller.findByMatricula);
+userRoutes.get("/id/:id", controller.findById);
 userRoutes.get("/:matricula", controller.findByMatricula);
 userRoutes.patch("/:id/password", (req, res) => controller.updatePassword(req, res));
 

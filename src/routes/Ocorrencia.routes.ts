@@ -13,6 +13,7 @@ ocorrenciaRoutes.post('/',
 
 ocorrenciaRoutes.get('/', (req, res) => controller.findAll(req, res));
 ocorrenciaRoutes.get('/:id', (req, res) => controller.findById(req, res));
+ocorrenciaRoutes.get('/usuario/:usuarioId', (req, res) => controller.findByUsuarioId(req, res));
 
 ocorrenciaRoutes.patch('/:id/status',
     auth,
