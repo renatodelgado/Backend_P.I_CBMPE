@@ -8,14 +8,9 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "outDir": "./dist",
-<<<<<<< HEAD
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "typeRoots": ["./src/@types", "./node_modules/@types"]
   },
   "include": ["src/**/*", "dist/migrations/1763912266403-CreateOcorrenciaUsers.ts"],
   "exclude": ["node_modules"]
-=======
-     "typeRoots": ["./src/@types", "./node_modules/@types"]
-    
-  }
->>>>>>> 023e5e1a161587f6a8a6367c2a5b60bbaed4bd2f
 }
