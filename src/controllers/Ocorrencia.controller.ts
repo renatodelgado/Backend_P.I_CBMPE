@@ -38,4 +38,25 @@ export class OcorrenciaController {
         }
     }
 
+    async updateStatus(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const { status } = req.body;
+
+            const user = req.user!;
+
+            const ocorrenciaAtualizada = await ocorrenciaService.updateStatus(Number(id), status, user);
+            res.status(200).json({
+                message: "Status atualizado com sucesso",
+                ocorrencia: ocorrenciaAtualizada
+            });
+        }catch(error: unknown){
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(400).json({ message });
+
+        }
+            
+        }
+    
+
 };

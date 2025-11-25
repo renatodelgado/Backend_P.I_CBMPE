@@ -14,4 +14,10 @@ ocorrenciaRoutes.post('/',
 ocorrenciaRoutes.get('/', (req, res) => controller.findAll(req, res));
 ocorrenciaRoutes.get('/:id', (req, res) => controller.findById(req, res));
 
+ocorrenciaRoutes.patch('/:id/status',
+    auth,
+    checkPermission(['GESTOR', 'OPERADOR', 'ADMINISTRADOR']),
+        (req, res) => controller.updateStatus(req, res)
+)
+
 export { ocorrenciaRoutes };

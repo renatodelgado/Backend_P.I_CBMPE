@@ -23,7 +23,7 @@ import { Vitima } from "../entities/Vitima";
 import { Lesao } from "../entities/Lesao";
 
 
-dotenv.config();
+
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -36,6 +36,8 @@ export const AppDataSource = new DataSource({
     EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
     GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao],
   migrations: ["dist/migrations/*.js"],
-  synchronize: true, 
+  synchronize: false,
+  migrationsRun: true,
+
   logging: false,
 });
