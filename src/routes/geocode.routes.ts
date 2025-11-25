@@ -24,3 +24,33 @@ geocodeRouter.get("/reverse-geocode", async (req, res) => {
     res.status(500).json({ error: "Erro ao buscar endereço" });
   }
 });
+
+geocodeRouter.get("/geocode", async (req, res) => {
+  const { q } = req.query;
+
+  if (!q) {
+    return res.status(400).json({ error: "Parâmetro 'q' (query) é obrigatório" });
+  }
+
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q as string)}&limit=1&addressdetails=1`,
+      {
+        headers: {
+          "User-Agent": "ChamaApp/1.0 (seu-email@exemplo.com)", // Use um email real se possível
+          "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Nominatim API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error("Erro no geocoding:", err);
+    res.status(500).json({ error: "Erro ao buscar coordenadas" });
+  }
+});

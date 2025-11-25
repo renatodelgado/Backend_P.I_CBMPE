@@ -60,4 +60,18 @@ export class UserController {
       return res.status(500).json({ message: "Erro interno ao buscar usuário." });
     }
   }
+
+  async findById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const user = await userService.findById(Number(id));
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado." });
+      }
+      return res.json(user);
+    } catch (error) {
+      console.error("Erro ao buscar usuário:", error);
+      return res.status(500).json({ message: "Erro interno ao buscar usuário." });
+    }
+  }
 }

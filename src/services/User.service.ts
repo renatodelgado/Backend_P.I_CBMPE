@@ -64,4 +64,23 @@ export class UserService {
       ultimoAcesso: user.ultimoAcesso ?? "-",
     };
   }
+
+  async findById(id: number): Promise<any | null> {
+    const user = await userRepository.findOne({
+      where: { id },
+      relations: ["perfil", "unidadeOperacional"],
+    });
+    if (!user) return null;
+
+    return {
+      id: user.id,
+      nome: user.nome,
+      matricula: user.matricula,
+      email: user.email,
+      perfil: { id: user.perfil?.id, nome: user.perfil?.nome },
+      unidadeOperacional: { id: user.unidadeOperacional?.id, nome: user.unidadeOperacional?.nome },
+      status: user.status ?? "Ativo",
+      ultimoAcesso: user.ultimoAcesso ?? "-",
+    };
+  }
 }

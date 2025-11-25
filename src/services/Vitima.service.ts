@@ -46,7 +46,7 @@ export class VitimaService {
 	}
 
 	// Retorna vítimas pela ocorrência (ocorrenciaId obrigatório)
-	async findByOcorrenciaId(ocorrenciaId: number) {
+	async findVitimasByOcorrenciaId(ocorrenciaId: number) {
 		if (!ocorrenciaId) throw new Error("ocorrenciaId é obrigatório");
 		return await VitimaRepository.find({
 			where: { ocorrencia: { id: ocorrenciaId } as any },

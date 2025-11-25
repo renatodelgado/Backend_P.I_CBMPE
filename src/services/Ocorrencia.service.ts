@@ -142,6 +142,24 @@ await AnexoRepository.save(anexos);
         return ocorrencia;
     }
 
+    // Buscar ocorrências por ID do usuário
+    async findByUsuarioId(usuarioId: number) {
+        return await ocorrenciaRepository.find({
+            where: { usuario: { id: usuarioId } },
+            relations: [
+                "naturezaOcorrencia",
+                "grupoOcorrencia",
+                "subgrupoOcorrencia",
+                "viatura",
+                "localizacao",
+                "usuario",
+                "unidadeOperacional",
+                "eventoEspecial",
+                "anexos"
+            ]
+        });
+    }
+
     // Atualizar uma ocorrência
     async update(id: number, data: Partial<Ocorrencia>) {
         const ocorrencia = await this.findById(id);

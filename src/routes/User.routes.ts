@@ -6,6 +6,7 @@ const controller = new UserController();
 
 userRoutes.post("/", controller.create);
 userRoutes.get("/", controller.findAll);
-userRoutes.get("/:matricula", controller.findByMatricula);
+userRoutes.get("/matricula/:matricula", controller.findByMatricula);
+userRoutes.get("/id/:id", controller.findById);
 
 export { userRoutes };

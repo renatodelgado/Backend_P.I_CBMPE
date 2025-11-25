@@ -7,6 +7,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "outDir": "./dist"
-  }
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*", "dist/migrations/1763912266403-CreateOcorrenciaUsers.ts"],
+  "exclude": ["node_modules"]
 }

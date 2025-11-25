@@ -7,5 +7,6 @@ const controller = new OcorrenciaController();
 ocorrenciaRoutes.post('/', (req, res) => controller.create(req, res));
 ocorrenciaRoutes.get('/', (req, res) => controller.findAll(req, res));
 ocorrenciaRoutes.get('/:id', (req, res) => controller.findById(req, res));
+ocorrenciaRoutes.get('/usuario/:usuarioId', (req, res) => controller.findByUsuarioId(req, res));
 
 export { ocorrenciaRoutes };
