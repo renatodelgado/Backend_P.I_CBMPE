@@ -201,4 +201,38 @@ await AnexoRepository.save(anexos);
         const ocorrencia = await this.findById(id);
         return await ocorrenciaRepository.remove(ocorrencia);
     }
+
+    async updateStatus(id: number, status: string, user: { id: number; perfil: string; }) {
+        const allowedStatus = [
+            "Pendentes",
+            "Em andamento",
+            "Concluídas",
+            "Não atendidas"
+        ];
+
+        if (!allowedStatus.includes(status)) {
+            throw new Error("Status inválido");
+        }
+
+        // Perfis que podem atualizar status (normalizados em maiúsculas)
+        const allowedPerfis = ["OPERADOR", "ADMINISTRADOR", "GESTOR"];
+
+        const userPerfil = (user.perfil || "").toString().toUpperCase();
+
+        if (!allowedPerfis.includes(userPerfil)) {
+            throw new Error("Você não tem permissão para atualizar o status desta ocorrência");
+        }
+
+        const ocorrencia = await this.findById(id);
+
+        if (!ocorrencia) {
+            throw new Error("Ocorrência não encontrada");
+        }
+
+        ocorrencia.statusAtendimento = status;
+
+        const updatedOcorrencia = await ocorrenciaRepository.save(ocorrencia);
+
+        return updatedOcorrencia;
+    }
 }

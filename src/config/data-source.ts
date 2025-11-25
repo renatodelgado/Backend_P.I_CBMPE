@@ -22,8 +22,10 @@ import { Anexo } from "../entities/Anexo";
 import { Vitima } from "../entities/Vitima";
 import { Lesao } from "../entities/Lesao";
 import { OcorrenciaUser } from "../entities/Ocorrencia_User";
+import { LogConflito } from "../entities/LogConflito";
 
-dotenv.config();
+
+
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -58,5 +60,12 @@ export const AppDataSource = new DataSource({
 
   migrations: ["dist/migrations/*.ts"],
   synchronize: false, // <<<<<< OBRIGATÓRIO
+  entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
+    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
+    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao, LogConflito],
+  migrations: ["dist/migrations/*.js"],
+  synchronize: false,
+  migrationsRun: true,
+
   logging: false,
 });

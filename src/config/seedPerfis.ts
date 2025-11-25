@@ -4,10 +4,10 @@ import { perfilRepository } from "../repositories/Perfil.repository";
 
 export async function seedPerfis() {
     const perfisFixos = [
-        {nome: "Administrador", descricao: "Acesso total ao sistema"},
-        {nome: "Gestor de Ocorrências", descricao: "Gerencia e edita ocorrências"},
-        {nome: "Analista Estatístico", descricao: "Visualiza relatórios e dashboards"},
-        {nome: "Operador de Campo", descricao: "Registra e acompanha ocorrências"},
+        {nome: "ADMINISTRADOR", descricao: "Acesso total ao sistema"},
+        {nome: "GESTOR", descricao: "Gerencia e edita ocorrências"},
+        {nome: "ANALISTA", descricao: "Visualiza relatórios e dashboards"},
+        {nome: "OPERADOR", descricao: "Registra e acompanha ocorrências"},
     ];
 
     for(const perfil of perfisFixos) {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany, VersionColumn } from "typeorm";
 import { UnidadeOperacional } from "./UnidadeOperacional";
 import { User } from "./User";
 import { EventoEspecial } from "./EventoEspecial";
@@ -24,7 +24,7 @@ export class Ocorrencia {
     @Column({ nullable: false })
     statusAtendimento!: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     motivoNaoAtendimento!: string;
 
     @Column({ type: "text", nullable: true })
@@ -70,6 +70,9 @@ export class Ocorrencia {
 
     @OneToMany(() => Anexo, (anexo) => anexo.ocorrencia, { cascade: true })
     anexos!: Anexo[];
+
+    @VersionColumn()
+    version!: number;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt!: Date;
