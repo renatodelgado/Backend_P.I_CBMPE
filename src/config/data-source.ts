@@ -60,6 +60,8 @@ export const AppDataSource = new DataSource({
     AuditLog
   ],
   migrations: ["dist/migrations/*.js"],
+  ],
+  migrations: ["src/migrations/*.ts"],
   synchronize: false,
   logging: false,
 });

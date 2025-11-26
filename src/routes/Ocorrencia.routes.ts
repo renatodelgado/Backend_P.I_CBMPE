@@ -8,7 +8,7 @@ const controller = new OcorrenciaController();
 
 ocorrenciaRoutes.post('/',
     auth,
-    checkPermission(['ATENDENTE', 'OPERADOR']),
+    checkPermission(['ATENDENTE', 'OPERADOR', 'ADMINISTRADOR']),
      (req, res) => controller.create(req, res));
 
 ocorrenciaRoutes.get('/', (req, res) => controller.findAll(req, res));
