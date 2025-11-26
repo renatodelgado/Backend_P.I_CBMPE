@@ -55,15 +55,9 @@ export const AppDataSource = new DataSource({
     Anexo,
     Vitima,
     Lesao,
-    OcorrenciaUser, // <<<<<<<<<<<< ESSA É A IMPORTANTE
+    OcorrenciaUser,
   ],
-
-  migrations: ["dist/migrations/*.ts"],
-  synchronize: false, // <<<<<< OBRIGATÓRIO
-  entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
-    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
-    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao, LogConflito],
-  migrations: ["dist/migrations/*.js"],
+  migrations: ["src/migrations/*.ts"],
   synchronize: false,
   migrationsRun: true,
 
