@@ -50,7 +50,6 @@ export class OcorrenciaController {
         }
     }
 
-}
     async updateStatus(req: Request, res: Response) {
         try {
             const { id } = req.params;

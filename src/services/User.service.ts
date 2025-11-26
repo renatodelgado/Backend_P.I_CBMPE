@@ -75,7 +75,7 @@ export class UserService {
       ultimoAcesso: user.ultimoAcesso ?? "-",
     };
   }
-}
+
   async updatePassword(id: number, novaSenha: string): Promise<void> {
     const user = await userRepository.findOne({ where: { id } });
     
