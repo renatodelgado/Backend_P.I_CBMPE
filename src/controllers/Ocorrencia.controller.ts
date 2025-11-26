@@ -38,4 +38,18 @@ export class OcorrenciaController {
         }
     }
 
+    async update(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const data = req.body;
+
+            // Chama o service.update existente
+            const updatedOcorrencia = await ocorrenciaService.update(Number(id), data);
+
+            res.status(200).json(updatedOcorrencia);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            res.status(500).json({ message: "Erro ao atualizar ocorrência: " + message });
+        }
+    }
 };
