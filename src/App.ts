@@ -1,6 +1,7 @@
 import express from "express";
 import { userRoutes } from "./routes/User.routes";
 import cors from "cors";
+import { auditMiddleware } from "./middleware/audit.middleware";
 import { AppDataSource } from "./config/data-source";
 import { Perfil } from "./entities/Perfil";
 import { UnidadeOperacional } from "./entities/UnidadeOperacional";
@@ -22,13 +23,20 @@ import logConflitoRoutes from "./routes/LogConflito.routes";
 
 export const app = express();
 
+// 1. CORS primeiro
 app.use(cors(
   { origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"] }
+    allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"] }
 ));
 
+// Middleware de auditoria (antes de parsear o body)
+app.use(auditMiddleware);
+
+// Parser de JSON
 app.use(express.json());
+
+// 4. Rotas
 app.use("/users", userRoutes);
 
 app.post("/teste", (req, res) => {
