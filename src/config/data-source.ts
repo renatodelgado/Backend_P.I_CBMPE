@@ -21,10 +21,11 @@ import { LogAuditoria } from "../entities/LogAuditoria";
 import { Anexo } from "../entities/Anexo";
 import { Vitima } from "../entities/Vitima";
 import { Lesao } from "../entities/Lesao";
+import { OcorrenciaUser } from "../entities/Ocorrencia_User";
 import { LogConflito } from "../entities/LogConflito";
 
 
-dotenv.config();
+
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -33,10 +34,33 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [User, Perfil, UnidadeOperacional, Regiao, AIS, Equipe,
-    EquipeUser,Telefone, Viatura, Ocorrencia, Localizacao, EventoEspecial, NaturezaOcorrencia,
-    GrupoOcorrencia, SubgrupoOcorrencia, LogAuditoria, Anexo, Vitima, Lesao, LogConflito],
-  migrations: ["dist/migrations/*.js"],
-  synchronize: false, 
+
+  entities: [
+    User,
+    Perfil,
+    UnidadeOperacional,
+    Regiao,
+    AIS,
+    Equipe,
+    EquipeUser,
+    Telefone,
+    Viatura,
+    Ocorrencia,
+    Localizacao,
+    EventoEspecial,
+    NaturezaOcorrencia,
+    GrupoOcorrencia,
+    SubgrupoOcorrencia,
+    LogAuditoria,
+    Anexo,
+    Vitima,
+    Lesao,
+    OcorrenciaUser,
+    LogConflito,
+  ],
+  migrations: ["src/migrations/*.ts"],
+  synchronize: false,
+  migrationsRun: true,
+
   logging: false,
 });

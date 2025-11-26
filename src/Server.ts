@@ -3,7 +3,12 @@ import { AppDataSource } from "./config/data-source";
 import dotenv from "dotenv";
 import { seedPerfis } from "./config/seedPerfis";
 
-dotenv.config();
+dotenv.config({
+  path:
+  process.env.NODE_ENV === "production"
+    ? ".env.production"
+    : ".env.development",
+});
 
 AppDataSource.initialize()
   .then(async () => {

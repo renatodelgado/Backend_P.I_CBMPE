@@ -10,6 +10,7 @@ import { Ocorrencia } from "../entities/Ocorrencia";
 import { Localizacao } from "../entities/Localizacao";
 import { SubgrupoOcorrenciaRepository } from "../repositories/SubgrupoOcorrencia.repository";
 import { AnexoRepository } from "../repositories/Anexo.repository";
+import { LogConflitoService } from "./LogConflito.service";
 
 export class OcorrenciaService {
 
@@ -142,10 +143,56 @@ await AnexoRepository.save(anexos);
         return ocorrencia;
     }
 
+    // Buscar ocorrências por ID do usuário
+    async findByUsuarioId(usuarioId: number) {
+        return await ocorrenciaRepository.find({
+            where: { usuario: { id: usuarioId } },
+            relations: [
+                "naturezaOcorrencia",
+                "grupoOcorrencia",
+                "subgrupoOcorrencia",
+                "viatura",
+                "localizacao",
+                "usuario",
+                "unidadeOperacional",
+                "eventoEspecial",
+                "anexos"
+            ]
+        });
+    }
+
     // Atualizar uma ocorrência
-    async update(id: number, data: Partial<Ocorrencia>) {
+    async update(id: number, data: Partial<Ocorrencia>, userId?: number) {
         const ocorrencia = await this.findById(id);
 
+        
+    // --- LWW: verificar conflito de concorrência (cliente envia seu updatedAt)
+    if (data.updatedAt) {
+        const clienteTime = new Date(data.updatedAt).getTime();
+        const servidorTime = new Date(ocorrencia.updatedAt).getTime();
+
+        if (isNaN(clienteTime)) {
+            throw new Error("Timestamp do cliente inválido em updatedAt");
+        }
+
+        if (clienteTime < servidorTime) {
+            // registra no log de conflito
+            const logSvc = new LogConflitoService();
+            await logSvc.registrarConflito({
+                entidade: "Ocorrencia",
+                entidadeId: id,
+                valoresCliente: data,
+                valoresServidor: ocorrencia,
+                valorMantido: ocorrencia,
+                usuarioId: userId ?? null
+            });
+
+            // lança erro específico para o controller devolver 409
+            const err: any = new Error("Conflito de edição: a ocorrência foi atualizada por outra fonte antes desta requisição.");
+            err.name = "ConflictError";
+            throw err;
+        }
+    }
         // Atualiza relações se passadas
         if (data.localizacao) {
             Object.assign(ocorrencia.localizacao, data.localizacao);
@@ -183,4 +230,39 @@ await AnexoRepository.save(anexos);
         const ocorrencia = await this.findById(id);
         return await ocorrenciaRepository.remove(ocorrencia);
     }
+
+    async updateStatus(id: number, status: string, user: { id: number; perfil: string; }) {
+        const allowedStatus = [
+            "Pendentes",
+            "Em andamento",
+            "Concluídas",
+            "Não atendidas"
+        ];
+
+        if (!allowedStatus.includes(status)) {
+            throw new Error("Status inválido");
+        }
+
+        // Perfis que podem atualizar status (normalizados em maiúsculas)
+        const allowedPerfis = ["OPERADOR", "ADMINISTRADOR", "GESTOR"];
+
+        const userPerfil = (user.perfil || "").toString().toUpperCase();
+
+        if (!allowedPerfis.includes(userPerfil)) {
+            throw new Error("Você não tem permissão para atualizar o status desta ocorrência");
+        }
+
+        const ocorrencia = await this.findById(id);
+
+        if (!ocorrencia) {
+            throw new Error("Ocorrência não encontrada");
+        }
+
+        ocorrencia.statusAtendimento = status;
+
+        const updatedOcorrencia = await ocorrenciaRepository.save(ocorrencia);
+
+        return updatedOcorrencia;
+    }
+
 }
