@@ -36,6 +36,9 @@ export class Ocorrencia {
     @Column({ type: "timestamp", nullable: true })
     dataSincronizacao?: Date;
 
+    @Column({ type: 'int', nullable: true })
+    updated_by!: number | null;
+
     @ManyToOne(() => UnidadeOperacional, { nullable: false })
     @JoinColumn({ name: "unidadeOperacionalId" })
     unidadeOperacional!: UnidadeOperacional;
@@ -81,4 +84,5 @@ export class Ocorrencia {
     updatedAt!: Date;
     SubgrupoOcorrencia: SubgrupoOcorrencia | null = new SubgrupoOcorrencia;
     Viatura: Viatura | null = new Viatura;
+
 }

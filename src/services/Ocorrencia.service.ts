@@ -10,6 +10,7 @@ import { Ocorrencia } from "../entities/Ocorrencia";
 import { Localizacao } from "../entities/Localizacao";
 import { SubgrupoOcorrenciaRepository } from "../repositories/SubgrupoOcorrencia.repository";
 import { AnexoRepository } from "../repositories/Anexo.repository";
+import { LogConflitoService } from "./LogConflito.service";
 
 export class OcorrenciaService {
 
@@ -161,8 +162,40 @@ await AnexoRepository.save(anexos);
     }
 
     // Atualizar uma ocorrência
-    async update(id: number, data: Partial<Ocorrencia>) {
+    async update(id: number, data: Partial<Ocorrencia>, userId?: number | null) {
         const ocorrencia = await this.findById(id);
+
+        
+    // --- LWW: verificar conflito de concorrência (cliente envia seu updatedAt)
+    if (data.updatedAt) {
+        const clienteTime = new Date(data.updatedAt).getTime();
+        const servidorTime = new Date(ocorrencia.updatedAt).getTime();
+
+        if (isNaN(clienteTime)) {
+            throw new Error("Timestamp do cliente inválido em updatedAt");
+        }
+
+        if (clienteTime > servidorTime) {
+            // registra no log de conflito
+            const logSvc = new LogConflitoService();
+            await logSvc.registrarConflito({
+                entidade: "Ocorrencia",
+                entidadeId: id,
+                valoresCliente: data,
+                valoresServidor: ocorrencia,
+                valorMantido: ocorrencia,
+                usuarioId: userId ?? null
+            });
+
+            // lança erro específico para o controller devolver 409
+            const err: any = new Error("Conflito de edição: a ocorrência foi atualizada por outra fonte antes desta requisição.");
+            err.name = "ConflictError";
+            throw err;
+        }
+    }
+
+        // Salvar usuário que fez a atualização
+        ocorrencia.updated_by = userId ?? null;
 
         // Atualiza relações se passadas
         if (data.localizacao) {
@@ -235,4 +268,5 @@ await AnexoRepository.save(anexos);
 
         return updatedOcorrencia;
     }
+
 }

@@ -57,11 +57,10 @@ export const AppDataSource = new DataSource({
     Lesao,
     OcorrenciaUser,
     LogConflito,
-    AuditLog
-  ],
-  migrations: ["dist/migrations/*.js"],
   ],
   migrations: ["src/migrations/*.ts"],
   synchronize: false,
+  migrationsRun: true,
+
   logging: false,
 });

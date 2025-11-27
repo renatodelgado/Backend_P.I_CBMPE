@@ -37,7 +37,6 @@ export class OcorrenciaController {
             res.status(400).json({ message });
         }
     }
-
     // Buscar ocorrências por ID do usuário
     async findByUsuarioId(req: Request, res: Response) {
         try {
@@ -49,7 +48,33 @@ export class OcorrenciaController {
             res.status(400).json({ message });
         }
     }
+    //Atualizar ocorrência
+    async update(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const data = req.body;
 
+            const userId = (req.user as any)?.id;
+
+            // Chama o service.update existente
+            const updatedOcorrencia = await ocorrenciaService.update(Number(id),
+            data,
+            userId);
+
+            res.status(200).json({
+                message: "Ocorrência atualizada com sucesso",
+                ocorrencia: updatedOcorrencia});
+
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            // responde 409 para conflito detectado
+            if ((error as any)?.name === "ConflictError") {
+                return res.status(409).json({ message });
+            }
+            res.status(500).json({ message: "Erro ao atualizar ocorrência: " + message });
+        }
+    }
+    // Atualizar status da ocorrência
     async updateStatus(req: Request, res: Response) {
         try {
             const { id } = req.params;
