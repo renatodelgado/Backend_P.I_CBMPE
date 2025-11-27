@@ -162,7 +162,7 @@ await AnexoRepository.save(anexos);
     }
 
     // Atualizar uma ocorrência
-    async update(id: number, data: Partial<Ocorrencia>, userId?: number) {
+    async update(id: number, data: Partial<Ocorrencia>, userId?: number | null) {
         const ocorrencia = await this.findById(id);
 
         
@@ -175,7 +175,7 @@ await AnexoRepository.save(anexos);
             throw new Error("Timestamp do cliente inválido em updatedAt");
         }
 
-        if (clienteTime < servidorTime) {
+        if (clienteTime > servidorTime) {
             // registra no log de conflito
             const logSvc = new LogConflitoService();
             await logSvc.registrarConflito({
@@ -193,6 +193,10 @@ await AnexoRepository.save(anexos);
             throw err;
         }
     }
+
+        // Salvar usuário que fez a atualização
+        ocorrencia.updated_by = userId ?? null;
+
         // Atualiza relações se passadas
         if (data.localizacao) {
             Object.assign(ocorrencia.localizacao, data.localizacao);

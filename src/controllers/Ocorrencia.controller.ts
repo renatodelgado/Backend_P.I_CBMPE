@@ -54,10 +54,12 @@ export class OcorrenciaController {
             const { id } = req.params;
             const data = req.body;
 
+            const userId = (req.user as any)?.id;
+
             // Chama o service.update existente
             const updatedOcorrencia = await ocorrenciaService.update(Number(id),
             data,
-            (req.user as any)?.id);
+            userId);
 
             res.status(200).json({
                 message: "Ocorrência atualizada com sucesso",
