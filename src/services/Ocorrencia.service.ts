@@ -215,7 +215,7 @@ await AnexoRepository.save(anexos);
             throw new Error("Timestamp do cliente inválido em updatedAt");
         }
 
-        if (clienteTime > servidorTime) {
+        if (clienteTime < servidorTime) {
             // registra no log de conflito
             const logSvc = new LogConflitoService();
             await logSvc.registrarConflito({
