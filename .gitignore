@@ -14,3 +14,6 @@ yarn-error.log*
 # IDEs e configs locais
 .vscode/
 .idea/
+
+#import para o banco de dados
+import-banco.ipynb

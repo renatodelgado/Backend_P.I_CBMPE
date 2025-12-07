@@ -15,7 +15,7 @@ export class Localizacao {
     @Column({ nullable: false })
     logradouro!: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     numero!: string;
 
     @Column({ nullable: true })
