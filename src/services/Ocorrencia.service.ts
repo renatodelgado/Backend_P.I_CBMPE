@@ -11,7 +11,7 @@ import { Localizacao } from "../entities/Localizacao";
 import { SubgrupoOcorrenciaRepository } from "../repositories/SubgrupoOcorrencia.repository";
 import { AnexoRepository } from "../repositories/Anexo.repository";
 import { LogConflitoService } from "./LogConflito.service";
-import { auditService } from "./Audit.service";
+import { LogAuditoriaService } from "./LogAuditoria.service";
 
 // Helper local para sanitizar objeto de ocorrência antes de gravar em log
 function sanitizeForAudit(obj: any) {
@@ -125,21 +125,21 @@ await AnexoRepository.save(anexos);
 
     }
 
-        // grava auditoria centralizada via auditService
+        // grava auditoria na tabela legada `log_auditoria`
         try {
-            await auditService.logEvent({
-                request_id: auditContext?.request_id,
-                event_type: 'ocorrencia_management',
-                actor: { user_id: auditContext?.actor_user_id ?? (savedOcorrencia.usuario?.id ? String(savedOcorrencia.usuario.id) : undefined), ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-                action: 'create',
-                resource: 'Ocorrencia',
-                resource_id: String(savedOcorrencia.id),
-                outcome: 'success',
-                changes: { before: null, after: sanitizeForAudit(savedOcorrencia) },
-                metadata: { anexos_count: (savedOcorrencia as any).anexos?.length ?? 0 }
-            });
+            const logSvc = new LogAuditoriaService();
+            const payload: Partial<any> = {
+                acao: 'create',
+                recurso: 'Ocorrencia',
+                detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(savedOcorrencia.id), changes: { before: null, after: sanitizeForAudit(savedOcorrencia) }, metadata: { anexos_count: (savedOcorrencia as any).anexos?.length ?? 0 } }),
+                ip: auditContext?.actor_ip ?? null,
+                userAgent: String(auditContext?.actor_user_agent ?? ''),
+                justificativa: null,
+                usuario: auditContext?.actor_user_id ? ({ id: isNaN(Number(auditContext.actor_user_id)) ? auditContext.actor_user_id : Number(auditContext.actor_user_id) } as any) : (savedOcorrencia.usuario?.id ? ({ id: savedOcorrencia.usuario.id } as any) : undefined)
+            };
+            await logSvc.createLog(payload);
         } catch (err) {
-            console.error('Erro ao gravar auditService (create ocorrencia):', err);
+            console.error('Erro ao gravar log_auditoria (create ocorrencia):', err);
         }
 
         return savedOcorrencia;
@@ -269,21 +269,21 @@ await AnexoRepository.save(anexos);
                 const before = sanitizeForAudit(ocorrencia);
                 const saved = await ocorrenciaRepository.save(ocorrencia);
 
-                // grava auditoria de atualização via auditService
+                // grava auditoria de atualização na tabela legada
                 try {
-                    await auditService.logEvent({
-                        request_id: auditContext?.request_id,
-                        event_type: 'ocorrencia_management',
-                        actor: { user_id: auditContext?.actor_user_id ?? (userId ? String(userId) : undefined), ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-                        action: 'update',
-                        resource: 'Ocorrencia',
-                        resource_id: String(saved.id),
-                        outcome: 'success',
-                        changes: { before, after: sanitizeForAudit(saved) },
-                        metadata: {}
-                    });
+                    const logSvc = new LogAuditoriaService();
+                    const payload: Partial<any> = {
+                        acao: 'update',
+                        recurso: 'Ocorrencia',
+                        detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(saved.id), changes: { before, after: sanitizeForAudit(saved) } }),
+                        ip: auditContext?.actor_ip ?? null,
+                        userAgent: String(auditContext?.actor_user_agent ?? ''),
+                        justificativa: null,
+                        usuario: auditContext?.actor_user_id ? ({ id: isNaN(Number(auditContext.actor_user_id)) ? auditContext.actor_user_id : Number(auditContext.actor_user_id) } as any) : (userId ? ({ id: userId } as any) : undefined)
+                    };
+                    await logSvc.createLog(payload);
                 } catch (err) {
-                    console.error('Erro ao gravar auditService (update ocorrencia):', err);
+                    console.error('Erro ao gravar log_auditoria (update ocorrencia):', err);
                 }
 
                 return saved;
@@ -292,21 +292,21 @@ await AnexoRepository.save(anexos);
     // Deletar ocorrência
     async delete(id: number, auditContext?: { request_id?: string; actor_user_id?: string; actor_ip?: string; actor_user_agent?: string }) {
         const ocorrencia = await this.findById(id);
-                // grava auditoria de remoção via auditService
+                // grava auditoria de remoção na tabela legada
                 try {
-                    await auditService.logEvent({
-                        request_id: auditContext?.request_id,
-                        event_type: 'ocorrencia_management',
-                        actor: { user_id: auditContext?.actor_user_id, ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-                        action: 'delete',
-                        resource: 'Ocorrencia',
-                        resource_id: String(ocorrencia.id),
-                        outcome: 'success',
-                        changes: { before: sanitizeForAudit(ocorrencia), after: null },
-                        metadata: {}
-                    });
+                    const logSvc = new LogAuditoriaService();
+                    const payload: Partial<any> = {
+                        acao: 'delete',
+                        recurso: 'Ocorrencia',
+                        detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(ocorrencia.id), changes: { before: sanitizeForAudit(ocorrencia), after: null } }),
+                        ip: auditContext?.actor_ip ?? null,
+                        userAgent: String(auditContext?.actor_user_agent ?? ''),
+                        justificativa: null,
+                        usuario: auditContext?.actor_user_id ? ({ id: isNaN(Number(auditContext.actor_user_id)) ? auditContext.actor_user_id : Number(auditContext.actor_user_id) } as any) : undefined
+                    };
+                    await logSvc.createLog(payload);
                 } catch (err) {
-                    console.error('Erro ao gravar auditService (delete ocorrencia):', err);
+                    console.error('Erro ao gravar log_auditoria (delete ocorrencia):', err);
                 }
 
                 return await ocorrenciaRepository.remove(ocorrencia);
@@ -344,21 +344,21 @@ await AnexoRepository.save(anexos);
 
                 const updatedOcorrencia = await ocorrenciaRepository.save(ocorrencia);
 
-                // audit
+                // grava audit na tabela legada
                 try {
-                    await auditService.logEvent({
-                        request_id: auditContext?.request_id,
-                        event_type: 'ocorrencia_management',
-                        actor: { user_id: auditContext?.actor_user_id ?? (user?.id ? String(user.id) : undefined), ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-                        action: 'update_status',
-                        resource: 'Ocorrencia',
-                        resource_id: String(id),
-                        outcome: 'success',
-                        changes: { before, after: { statusAtendimento: status } },
-                        metadata: {}
-                    });
+                    const logSvc = new LogAuditoriaService();
+                    const payload: Partial<any> = {
+                        acao: 'update_status',
+                        recurso: 'Ocorrencia',
+                        detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(id), changes: { before, after: { statusAtendimento: status } } }),
+                        ip: auditContext?.actor_ip ?? null,
+                        userAgent: String(auditContext?.actor_user_agent ?? ''),
+                        justificativa: null,
+                        usuario: auditContext?.actor_user_id ? ({ id: isNaN(Number(auditContext.actor_user_id)) ? auditContext.actor_user_id : Number(auditContext.actor_user_id) } as any) : (user?.id ? ({ id: user.id } as any) : undefined)
+                    };
+                    await logSvc.createLog(payload);
                 } catch (err) {
-                    console.error('Erro ao gravar auditService (update_status):', err);
+                    console.error('Erro ao gravar log_auditoria (update_status):', err);
                 }
 
                 return updatedOcorrencia;

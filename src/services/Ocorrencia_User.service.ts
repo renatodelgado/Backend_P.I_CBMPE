@@ -4,7 +4,7 @@ import { userRepository } from "../repositories/User.repository";
 import { OcorrenciaUser } from "../entities/Ocorrencia_User";
 import { Ocorrencia } from "../entities/Ocorrencia";
 import { User } from "../entities/User";
-import { auditService } from "./Audit.service";
+import { LogAuditoriaService } from "./LogAuditoria.service";
 
 export class OcorrenciaUserService {
     // Relaciona um usuário a uma ocorrência
@@ -61,21 +61,21 @@ export class OcorrenciaUserService {
                 console.error("Erro ao enviar push notification:", err);
             }
 
-            // Grava auditoria usando auditService (centraliza gravação em audit_logs e log_auditoria)
+            // Grava auditoria na tabela legada `log_auditoria`
             try {
-                await auditService.logEvent({
-                    request_id: auditContext?.request_id,
-                    event_type: 'ocorrencia_management',
-                    actor: { user_id: auditContext?.actor_user_id, ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-                    action: 'assign_user',
-                    resource: 'Ocorrencia',
-                    resource_id: String(data.ocorrenciaId),
-                    outcome: 'success',
-                    changes: { before: null, after: { userId: data.userId } },
-                    metadata: { via: 'Ocorrencia_User.service' }
-                });
+                const logSvc = new LogAuditoriaService();
+                const payload: Partial<any> = {
+                    acao: 'assign_user',
+                    recurso: 'Ocorrencia',
+                    detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(data.ocorrenciaId), changes: { before: null, after: { userId: data.userId } }, metadata: { via: 'Ocorrencia_User.service' } }),
+                    ip: auditContext?.actor_ip ?? null,
+                    userAgent: String(auditContext?.actor_user_agent ?? ''),
+                    justificativa: null,
+                    usuario: ({ id: user.id } as any)
+                };
+                await logSvc.createLog(payload);
             } catch (err) {
-                console.error('Erro ao gravar auditService (assign):', err);
+                console.error('Erro ao gravar log_auditoria (assign):', err);
             }
 
             return saved;
@@ -155,21 +155,21 @@ export class OcorrenciaUserService {
 
         await ocorrenciaUserRepository.remove(rel);
 
-        // grava auditoria de remoção via auditService
+        // grava auditoria de remoção na tabela legada
         try {
-            await auditService.logEvent({
-                request_id: auditContext?.request_id,
-                event_type: 'ocorrencia_management',
-                actor: { user_id: auditContext?.actor_user_id, ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-                action: 'remove_user',
-                resource: 'Ocorrencia',
-                resource_id: String(ocorrenciaId),
-                outcome: 'success',
-                changes: { before: { userId }, after: null },
-                metadata: { via: 'Ocorrencia_User.service' }
-            });
+            const logSvc = new LogAuditoriaService();
+            const payload: Partial<any> = {
+                acao: 'remove_user',
+                recurso: 'Ocorrencia',
+                detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(ocorrenciaId), changes: { before: { userId }, after: null }, metadata: { via: 'Ocorrencia_User.service' } }),
+                ip: auditContext?.actor_ip ?? null,
+                userAgent: String(auditContext?.actor_user_agent ?? ''),
+                justificativa: null,
+                usuario: auditContext?.actor_user_id ? ({ id: isNaN(Number(auditContext.actor_user_id)) ? auditContext.actor_user_id : Number(auditContext.actor_user_id) } as any) : undefined
+            };
+            await logSvc.createLog(payload);
         } catch (err) {
-            console.error('Erro ao gravar auditService (remove):', err);
+            console.error('Erro ao gravar log_auditoria (remove):', err);
         }
         return { message: "Relação removida com sucesso" };
     }

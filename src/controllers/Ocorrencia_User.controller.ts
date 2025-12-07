@@ -6,14 +6,18 @@ const ocorrenciaUserService = new OcorrenciaUserService();
 export class OcorrenciaUserController {
     async relateUserToOcorrencia(req: Request, res: Response) {
         try {
+            const ipRaw = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.ip || (req.socket && (req.socket as any).remoteAddress) || '';
+            const actorIp = ipRaw === '::1' ? '127.0.0.1' : ipRaw;
+
             const auditContext = {
                 request_id: (req as any).requestId,
-                actor_ip: req.ip || req.socket.remoteAddress,
+                actor_ip: actorIp,
                 actor_user_agent: req.headers['user-agent'] as string | undefined,
                 actor_user_id: (req as any).user?.id ? String((req as any).user.id) : undefined
             };
 
             const result = await ocorrenciaUserService.relateUserToOcorrencia(req.body, auditContext);
+            res.setHeader('X-Audit-Logged', '1');
             return res.status(200).json(result);
         } catch (error: any) {
             return res.status(400).json({ error: error.message });
@@ -51,6 +55,7 @@ export class OcorrenciaUserController {
                 actor_user_id: (req as any).user?.id ? String((req as any).user.id) : undefined
             };
             const result = await ocorrenciaUserService.deleteUsersbyOcorrencia(ocorrenciaId, userId, auditContext);
+            res.setHeader('X-Audit-Logged', '1');
             return res.status(200).json(result);
         } catch (error: any) {
             return res.status(400).json({ error: error.message });

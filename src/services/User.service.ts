@@ -2,7 +2,7 @@ import { userRepository } from "../repositories/User.repository";
 import { perfilRepository } from "../repositories/Perfil.repository";
 import { User } from "../entities/User";
 import bcrypt from "bcrypt";
-import { auditService } from "./Audit.service";
+import { LogAuditoriaService } from "./LogAuditoria.service";
 
 export class UserService {
   async create(
@@ -30,42 +30,43 @@ export class UserService {
 
       const savedUser = await userRepository.save(newUser);
 
-      // AUDIT SUCCESS
-      await auditService.logEvent({
-        request_id: auditContext?.request_id,
-        event_type: "user_management",
-        actor: {
-          ip: auditContext?.actor_ip,
-          user_agent: auditContext?.actor_user_agent,
-        },
-        action: "create_user",
-        resource: "User",
-        resource_id: savedUser.matricula,
-        outcome: "success",
-        changes: {
-          before: null,
-          after: {
-            matricula: savedUser.matricula,
-            nome: savedUser.nome,
-            email: savedUser.email,
-            patente: savedUser.patente,
-            funcao: savedUser.funcao,
-            senha: "[PROTECTED]",
-          },
-        },
-      });
+      // AUDIT SUCCESS - grava diretamente na tabela legada `log_auditoria`
+      try {
+        const logService = new LogAuditoriaService();
+        const actorId = auditContext?.actor_ip ? auditContext?.actor_ip : undefined;
+        // Preferir o actor_user_id (quem fez a ação). Se não houver (ex.: auto-criação), usar o próprio usuário criado.
+        const usuarioField = auditContext && (auditContext as any).actor_user_id ? ({ id: isNaN(Number((auditContext as any).actor_user_id)) ? (auditContext as any).actor_user_id : Number((auditContext as any).actor_user_id) } as any) : ({ id: savedUser.id } as any);
+
+        const legPayload: Partial<any> = {
+          acao: "create_user",
+          recurso: "User",
+          detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: savedUser.matricula, changes: { before: null, after: { matricula: savedUser.matricula, nome: savedUser.nome, email: savedUser.email, patente: savedUser.patente, funcao: savedUser.funcao } } }),
+          ip: auditContext?.actor_ip ?? null,
+          userAgent: String(auditContext?.actor_user_agent ?? ''),
+          justificativa: null,
+          usuario: usuarioField
+        };
+        await logService.createLog(legPayload);
+      } catch (err: any) {
+        console.error('Falha ao gravar log_auditoria (create user):', err?.message ?? err);
+      }
 
       return savedUser;
     } catch (error: any) {
-      await auditService.logEvent({
-        request_id: auditContext?.request_id,
-        event_type: "user_management",
-        actor: { ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
-        action: "create_user",
-        resource: "User",
-        outcome: "error",
-        metadata: { error: error?.message },
-      });
+      try {
+        const logService = new LogAuditoriaService();
+        const legPayload: Partial<any> = {
+          acao: "create_user",
+          recurso: "User",
+          detalhes: JSON.stringify({ request_id: auditContext?.request_id, error: error?.message }),
+          ip: auditContext?.actor_ip ?? null,
+          userAgent: String(auditContext?.actor_user_agent ?? ''),
+          justificativa: null,
+        };
+        await logService.createLog(legPayload);
+      } catch (err2: any) {
+        console.error('Falha ao gravar log_auditoria (create user error):', err2?.message ?? err2);
+      }
       throw error;
     }
   }

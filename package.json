@@ -7,8 +7,7 @@
     "dev": "dotenv -e .env -- ts-node-dev --respawn --transpile-only src/Server.ts",
     "build": "tsc",
     "start": "node dist/Server.js",
-    "typeorm": "typeorm-ts-node-commonjs",
-    "test:audit": "npx ts-node src/scripts/audit-test.ts"
+    "typeorm": "typeorm-ts-node-commonjs"
   },
   "author": "",
   "license": "ISC",

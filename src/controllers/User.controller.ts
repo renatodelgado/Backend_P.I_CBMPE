@@ -8,20 +8,24 @@ const userService = new UserService();
 export class UserController {
   async create(req: Request, res: Response) {
     try {
-      const { nome, patente, funcao, email, senha, unidadeOperacional, perfil } = req.body;
+      const { nome, patente, funcao, email, senha, unidadeOperacional, perfil, cpf } = req.body;
 
-      if (!nome || !patente || !funcao || !email || !senha || !unidadeOperacional || !perfil) {
+      if (!nome || !patente || !funcao || !email || !senha || !unidadeOperacional || !perfil || !cpf) {
         return res.status(400).json({ message: "Preencha todos os campos obrigatórios." });
       }
 
+      const ipRaw = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.ip || (req.socket && (req.socket as any).remoteAddress) || '';
+      const actorIp = ipRaw === '::1' ? '127.0.0.1' : ipRaw;
+
       const auditContext = {
         request_id: (req as any).requestId,
-        actor_ip: req.ip || req.socket.remoteAddress,
+        actor_ip: actorIp,
         actor_user_agent: req.headers['user-agent'] as string | undefined,
       };
 
       const user = await userService.create({
         nome,
+        cpf,
         patente,
         funcao,
         email,
@@ -32,6 +36,8 @@ export class UserController {
         updatedAt: new Date(),
       } as any, auditContext);
 
+      // Indica ao middleware que o log já foi gravado pelo service
+      res.setHeader('X-Audit-Logged', '1');
       return res.status(201).json(user);
     } catch (error) {
       console.error("Erro ao criar usuário:", error);
