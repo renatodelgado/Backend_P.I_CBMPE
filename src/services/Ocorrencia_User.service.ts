@@ -4,10 +4,11 @@ import { userRepository } from "../repositories/User.repository";
 import { OcorrenciaUser } from "../entities/Ocorrencia_User";
 import { Ocorrencia } from "../entities/Ocorrencia";
 import { User } from "../entities/User";
+import { LogAuditoriaService } from "./LogAuditoria.service";
 
 export class OcorrenciaUserService {
     // Relaciona um usuário a uma ocorrência
-    async relateUserToOcorrencia(data: any) {
+    async relateUserToOcorrencia(data: any, auditContext?: { request_id?: string; actor_ip?: string; actor_user_agent?: string; actor_user_id?: string }) {
         // validações mínimas
         if (!data.ocorrenciaId) {
             throw new Error("campo 'ocorrenciaId' é obrigatório");
@@ -32,7 +33,52 @@ export class OcorrenciaUserService {
         });
 
         const saved = await ocorrenciaUserRepository.save(ocorrenciaUser);
-        return saved;
+
+        // Envia notificação push (Expo) se o usuário tiver pushToken
+            try {
+                const token = (user as any).pushToken;
+                // envia apenas para tokens do Expo (app mobile). Ajuste a validação conforme seu formato de token.
+                if (token && typeof token === "string" && token.startsWith("ExponentPushToken")) {
+                    const body = {
+                        to: token,
+                        title: "Nova Ocorrência!",
+                        body: "Você foi designado para uma ocorrência.",
+                        sound: "default",
+                        data: { ocorrenciaId: data.ocorrenciaId }
+                    };
+
+                    // usa global fetch quando disponível (Node 18+) ou ignora se não
+                    if (typeof (globalThis as any).fetch === "function") {
+                        await (globalThis as any).fetch("https://exp.host/--/api/v2/push/send", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(body)
+                        });
+                    }
+                }
+            } catch (err) {
+                // não impedir fluxo principal se falhar no envio da notificação
+                console.error("Erro ao enviar push notification:", err);
+            }
+
+            // Grava auditoria na tabela legada `log_auditoria`
+            try {
+                const logSvc = new LogAuditoriaService();
+                const payload: Partial<any> = {
+                    acao: 'assign_user',
+                    recurso: 'Ocorrencia',
+                    detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(data.ocorrenciaId), changes: { before: null, after: { userId: data.userId } }, metadata: { via: 'Ocorrencia_User.service' } }),
+                    ip: auditContext?.actor_ip ?? null,
+                    userAgent: String(auditContext?.actor_user_agent ?? ''),
+                    justificativa: null,
+                    usuario: ({ id: user.id } as any)
+                };
+                await logSvc.createLog(payload);
+            } catch (err) {
+                console.error('Erro ao gravar log_auditoria (assign):', err);
+            }
+
+            return saved;
     }
 
     // Retorna todos os usuários relacionados a uma ocorrência
@@ -97,5 +143,34 @@ export class OcorrenciaUserService {
 
         // retorna lista de objetos com ocorrencia e papel
         return Array.from(resultsMap.values());
+    }
+
+    // Remove a relação entre um usuário e uma ocorrência
+    async deleteUsersbyOcorrencia(ocorrenciaId: number, userId: number, auditContext?: { request_id?: string; actor_ip?: string; actor_user_agent?: string; actor_user_id?: string }) {
+        if (!ocorrenciaId) throw new Error("campo 'ocorrenciaId' é obrigatório");
+        if (!userId) throw new Error("campo 'userId' sé obrigatório");
+
+        const rel = await ocorrenciaUserRepository.findOneBy({ ocorrenciaId, userId });
+        if (!rel) throw new Error("Relação entre usuário e ocorrência não encontrada");
+
+        await ocorrenciaUserRepository.remove(rel);
+
+        // grava auditoria de remoção na tabela legada
+        try {
+            const logSvc = new LogAuditoriaService();
+            const payload: Partial<any> = {
+                acao: 'remove_user',
+                recurso: 'Ocorrencia',
+                detalhes: JSON.stringify({ request_id: auditContext?.request_id, resource_id: String(ocorrenciaId), changes: { before: { userId }, after: null }, metadata: { via: 'Ocorrencia_User.service' } }),
+                ip: auditContext?.actor_ip ?? null,
+                userAgent: String(auditContext?.actor_user_agent ?? ''),
+                justificativa: null,
+                usuario: auditContext?.actor_user_id ? ({ id: isNaN(Number(auditContext.actor_user_id)) ? auditContext.actor_user_id : Number(auditContext.actor_user_id) } as any) : undefined
+            };
+            await logSvc.createLog(payload);
+        } catch (err) {
+            console.error('Erro ao gravar log_auditoria (remove):', err);
+        }
+        return { message: "Relação removida com sucesso" };
     }
 }

@@ -20,6 +20,8 @@ import { lesaoRoutes } from "./routes/Lesao.routes";
 import { vitimaRoutes } from "./routes/Vitima.routes";
 import { ocorrenciaUserRoutes } from "./routes/Ocorrencia_User.routes";
 import logConflitoRoutes from "./routes/LogConflito.routes"; 
+import { anexoRoutes } from "./routes/Anexo.routes";
+import { logAuditoriaRoutes } from "./routes/LogAuditoria.routes";
 
 export const app = express();
 
@@ -30,19 +32,15 @@ app.use(cors(
     allowedHeaders: ["Content-Type", "Authorization", "X-Request-ID"] }
 ));
 
-// Middleware de auditoria (antes de parsear o body)
-app.use(auditMiddleware);
-
 // Parser de JSON
 app.use(express.json());
 
+// Middleware de auditoria (após parse do body para permitir leitura de req.body
+// e após middlewares de autenticação que possam popular `req.user`).
+app.use(auditMiddleware);
+
 // 4. Rotas
 app.use("/users", userRoutes);
-
-app.post("/teste", (req, res) => {
-  console.log("📩 Body recebido em /teste:", req.body);
-  res.json({ recebido: req.body });
-});
 
 app.use("/perfis", perfilRoutes);
 
@@ -73,3 +71,7 @@ app.use("/auth", authRoutes);
 app.use("/ocorrencia-user", ocorrenciaUserRoutes);
 
 app.use("/log-conflitos", logConflitoRoutes);
+
+app.use("/anexos", anexoRoutes);
+
+app.use("/audit", logAuditoriaRoutes);

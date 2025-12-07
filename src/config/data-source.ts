@@ -51,16 +51,20 @@ export const AppDataSource = new DataSource({
     NaturezaOcorrencia,
     GrupoOcorrencia,
     SubgrupoOcorrencia,
-    LogAuditoria,
+      LogAuditoria,
     Anexo,
     Vitima,
     Lesao,
     OcorrenciaUser,
     LogConflito,
+      AuditLog,
   ],
   migrations: ["src/migrations/*.ts"],
-  synchronize: false,
-  migrationsRun: true,
+  // Em desenvolvimento, permitimos que o TypeORM sincronize o schema
+  // Isso cria tabelas faltantes como `audit_logs`. NÃO habilite em produção.
+  synchronize: process.env.NODE_ENV !== 'production',
+  migrationsRun: false,
 
-  logging: false,
+  // Habilita logging em desenvolvimento para depuração de SQL
+  logging: process.env.NODE_ENV !== 'production',
 });

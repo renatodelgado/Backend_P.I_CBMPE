@@ -25,7 +25,7 @@ export class VitimaService {
 		if (!lesao) throw new Error("Lesão não encontrada");
 
 		const vitimaToSave: any = {
-			cpfVitima: data.cpfVitima ?? null,
+			cpfVitima: data.cpf_vitima || data.cpfVitima || null,
 			nome: data.nome,
 			idade: data.idade ?? null,
 			sexo: data.sexo ?? null,
@@ -50,8 +50,24 @@ export class VitimaService {
 		if (!ocorrenciaId) throw new Error("ocorrenciaId é obrigatório");
 		return await VitimaRepository.find({
 			where: { ocorrencia: { id: ocorrenciaId } as any },
-			relations: ["ocorrencia"]
+			relations: ["ocorrencia", "lesao"]
 		});
+	}
+
+	// Atualiza uma vítima 
+	async updateVitima(id: number, data: any) {
+		const vitima = await VitimaRepository.findOneBy({ id });
+		if (!vitima) throw new Error("Vítima não encontrada");
+		const updatedVitima = { ...vitima, ...data };
+		return await VitimaRepository.save(updatedVitima);
+	}
+
+	// Deleta uma vítima
+	async deleteVitima(id: number) {
+		const vitima = await VitimaRepository.findOneBy({ id });
+		if (!vitima) throw new Error("Vítima não encontrada");
+		await VitimaRepository.delete(id);
+		return { message: "Vítima deletada com sucesso" };
 	}
 
 }

@@ -7,7 +7,19 @@ export class OcorrenciaController {
     // Criar uma ocorrência
     async create(req: Request, res: Response) {
         try {
-            const ocorrencia = await ocorrenciaService.create(req.body);
+            const ipRaw = (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() || req.ip || (req.socket && (req.socket as any).remoteAddress) || '';
+            const actorIp = ipRaw === '::1' ? '127.0.0.1' : ipRaw;
+
+            const auditContext = {
+                request_id: (req as any).requestId,
+                actor_ip: actorIp,
+                actor_user_agent: req.headers['user-agent'] as string | undefined,
+                actor_user_id: (req as any).user?.id ? String((req as any).user.id) : undefined
+            };
+
+            const ocorrencia = await ocorrenciaService.create(req.body, auditContext);
+            // marca para evitar log duplicado pelo middleware
+            res.setHeader('X-Audit-Logged', '1');
             res.status(201).json(ocorrencia);
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : String(error);
@@ -55,12 +67,16 @@ export class OcorrenciaController {
             const data = req.body;
 
             const userId = (req.user as any)?.id;
+            const auditContext = {
+                request_id: (req as any).requestId,
+                actor_ip: req.ip || req.socket.remoteAddress,
+                actor_user_agent: req.headers['user-agent'] as string | undefined,
+                actor_user_id: (req as any).user?.id ? String((req as any).user.id) : undefined
+            };
 
             // Chama o service.update existente
-            const updatedOcorrencia = await ocorrenciaService.update(Number(id),
-            data,
-            userId);
-
+            const updatedOcorrencia = await ocorrenciaService.update(Number(id), data, userId, auditContext);
+            res.setHeader('X-Audit-Logged', '1');
             res.status(200).json({
                 message: "Ocorrência atualizada com sucesso",
                 ocorrencia: updatedOcorrencia});
@@ -82,7 +98,15 @@ export class OcorrenciaController {
 
             const user = req.user!;
 
-            const ocorrenciaAtualizada = await ocorrenciaService.updateStatus(Number(id), status, user);
+            const auditContext = {
+                request_id: (req as any).requestId,
+                actor_ip: req.ip || req.socket.remoteAddress,
+                actor_user_agent: req.headers['user-agent'] as string | undefined,
+                actor_user_id: (req as any).user?.id ? String((req as any).user.id) : undefined
+            };
+
+            const ocorrenciaAtualizada = await ocorrenciaService.updateStatus(Number(id), status, user, auditContext);
+            res.setHeader('X-Audit-Logged', '1');
             res.status(200).json({
                 message: "Status atualizado com sucesso",
                 ocorrencia: ocorrenciaAtualizada
@@ -94,6 +118,26 @@ export class OcorrenciaController {
         }
             
         }
-    
 
-};
+        // Atualizar parte da ocorrência
+    async partialUpdate(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const data = req.body;
+            const userId = (req.user as any)?.id;
+
+            const updatedOcorrencia = await ocorrenciaService.partialUpdate(Number(id), data, userId);
+            res.setHeader('X-Audit-Logged', '1');
+            res.status(200).json({
+                message: "Ocorrência atualizada parcialmente com sucesso",
+                ocorrencia: updatedOcorrencia
+            });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            if ((error as any)?.name === "ConflictError") {
+                return res.status(409).json({ message });
+            }
+            res.status(500).json({ message: "Erro ao atualizar parcialmente ocorrência: " + message });
+        }
+    }  
+}

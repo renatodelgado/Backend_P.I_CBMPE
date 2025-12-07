@@ -20,5 +20,16 @@ export class VitimaController {
 		const vitimas = await vitimaService.findVitimasByOcorrenciaId(Number(ocorrenciaId));
 		return res.json(vitimas);
 	}
-}
 
+	async updateVitima(req: Request, res: Response) {
+		const { id } = req.params;
+		const vitima = await vitimaService.updateVitima(Number(id), req.body);
+		return res.json(vitima);
+	}
+
+	async deleteVitima(req: Request, res: Response) {
+		const { id } = req.params;
+		const result = await vitimaService.deleteVitima(Number(id));
+		return res.json(result);
+	}
+}

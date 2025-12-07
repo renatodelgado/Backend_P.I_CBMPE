@@ -33,4 +33,11 @@ ocorrenciaRoutes.put(
   (req, res) => controller.update(req, res)
 );
 
+// Atualizar parte da ocorrência
+ocorrenciaRoutes.patch(
+  '/:id',
+  auth, // só precisa estar logado
+  (req, res) => controller.partialUpdate(req, res)
+);
+
 export { ocorrenciaRoutes };
