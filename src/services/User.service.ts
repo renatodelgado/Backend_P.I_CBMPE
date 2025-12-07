@@ -165,4 +165,14 @@ export class UserService {
       unidadeOperacional: { id: saved.unidadeOperacional?.id, nome: saved.unidadeOperacional?.nome }
     };
   }
+
+  async updatePushToken(id: number, pushToken: string): Promise<void> {
+    const user = await userRepository.findOne({ where: { id } }); 
+    if (!user) {
+      throw new Error("Usuário não encontrado");
+    }
+
+    user.pushToken = pushToken;
+    await userRepository.save(user);
+  }
 }

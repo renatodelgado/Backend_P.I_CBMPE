@@ -20,6 +20,7 @@ import { lesaoRoutes } from "./routes/Lesao.routes";
 import { vitimaRoutes } from "./routes/Vitima.routes";
 import { ocorrenciaUserRoutes } from "./routes/Ocorrencia_User.routes";
 import logConflitoRoutes from "./routes/LogConflito.routes"; 
+import { anexoRoutes } from "./routes/Anexo.routes";
 
 export const app = express();
 
@@ -73,3 +74,9 @@ app.use("/auth", authRoutes);
 app.use("/ocorrencia-user", ocorrenciaUserRoutes);
 
 app.use("/log-conflitos", logConflitoRoutes);
+
+app.use("/anexos", anexoRoutes);
+
+app.use("/audit", (req, res) => {
+  res.status(200).send("Serviço de auditoria ativo.");
+});

@@ -3,6 +3,8 @@ import crypto from 'node:crypto';
 import pino from 'pino';
 import { AppDataSource } from '../config/data-source';
 import { AuditLog } from '../entities/AuditLog';
+import { LogAuditoriaRepository } from '../repositories/LogAuditoria.repository';
+import { LogAuditoria } from '../entities/LogAuditoria';
 
 // Logger JSON estruturado (vai para stdout)
 const logger = pino({
@@ -32,7 +34,7 @@ export interface AuditEvent {
 }
 
 export class AuditService {
-  private readonly auditRepository = AppDataSource.getRepository(AuditLog);
+  // repository obtained lazily to avoid metadata errors when module is imported
 
   // MÉTODO PRINCIPAL: registra um evento de auditoria
   async logEvent(event: AuditEvent): Promise<void> {
@@ -62,8 +64,46 @@ export class AuditService {
 
       // 4. Salva no banco de dados (se estiver inicializado)
       if (AppDataSource.isInitialized) {
-        const auditLog = this.auditRepository.create(auditEntry);
-        await this.auditRepository.save(auditLog);
+        try {
+          const auditRepo = AppDataSource.getRepository(AuditLog);
+          const auditLog = auditRepo.create(auditEntry as any);
+          await auditRepo.save(auditLog);
+
+          // também grava no log_auditoria (legado) para compatibilidade
+          try {
+            // Prepara registro para a tabela legada `log_auditoria` garantindo campos obrigatórios
+            const safeDetails = (() => {
+              try {
+                return JSON.stringify({ request_id: auditEntry.request_id, resource_id: auditEntry.resource_id, changes: auditEntry.changes, metadata: auditEntry.metadata });
+              } catch (e) {
+                return `Could not serialize details: ${String(e)}`;
+              }
+            })();
+
+            const leg = {
+              acao: String(auditEntry.action ?? '').slice(0, 255),
+              recurso: String(auditEntry.resource ?? '').slice(0, 255),
+              detalhes: safeDetails,
+              ip: auditEntry.actor_ip ?? null,
+              userAgent: auditEntry.actor_user_agent ?? '', // coluna NÃO NULA no schema legada
+              justificativa: auditEntry.metadata?.justificativa ?? null,
+              usuario: auditEntry.actor_user_id ? ({ id: isNaN(Number(auditEntry.actor_user_id)) ? auditEntry.actor_user_id : Number(auditEntry.actor_user_id) } as any) : undefined
+            } as Partial<LogAuditoria>;
+
+            const legacyRepo = AppDataSource.getRepository(LogAuditoria);
+            const rec = legacyRepo.create(leg as any);
+            // tenta salvar de forma robusta (aguarda e registra erro caso ocorra)
+            try {
+              await legacyRepo.save(rec);
+            } catch (err: any) {
+              logger.error({ err: err?.message }, 'Falha ao salvar log_auditoria');
+            }
+          } catch (err: any) {
+            logger.error({ err: err?.message }, 'Falha ao montar log_auditoria');
+          }
+        } catch (err: any) {
+          logger.error({ err: err?.message }, 'Falha ao salvar audit_logs');
+        }
       } else {
         logger.warn('DataSource não inicializado, log apenas no console');
       }

@@ -57,6 +57,8 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
       }).catch((err: any) => {
         console.error('Falha ao logar auditoria:', err);
       });
+
+      // Observação: gravação em `log_auditoria` agora é feita centralmente pelo `auditService`
     }
 
     return originalSend.call(this, data);
@@ -67,6 +69,39 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
 
 // Placeholder: quando implementar auth JWT, extrair matricula do token
 function extractUserIdFromRequest(req: Request): string | undefined {
-  // Quando implementar JWT: return (req as any).user?.matricula;
+  // Tentativa de extrair id disponível no req.user (middleware de auth seta req.user.id)
+  try {
+    const u = (req as any).user;
+    if (u && (u.id || u.matricula)) {
+      return String(u.id ?? u.matricula);
+    }
+  } catch (err) {
+    // ignore
+  }
   return undefined;
+}
+
+// Sanitiza campos sensíveis de objetos simples (remove senhas, tokens)
+function sanitize(obj: any): any {
+  if (!obj) return obj;
+  if (typeof obj !== 'object') return obj;
+
+  const sensitive = ['senha', 'password', 'token', 'secret', 'pushToken'];
+
+  const clone: any = Array.isArray(obj) ? [] : {};
+  for (const k of Object.keys(obj)) {
+    try {
+      const v = obj[k];
+      if (sensitive.some(s => k.toLowerCase().includes(s))) {
+        clone[k] = '[PROTECTED]';
+      } else if (v && typeof v === 'object') {
+        clone[k] = sanitize(v);
+      } else {
+        clone[k] = v;
+      }
+    } catch (err) {
+      clone[k] = '[UNSERIALIZABLE]';
+    }
+  }
+  return clone;
 }

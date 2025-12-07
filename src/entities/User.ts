@@ -53,6 +53,9 @@ export class User {
   @Column({ type: "timestamp", nullable: true })
   ultimoAcesso?: Date;
 
+  @Column({ nullable: true })
+  pushToken?: string;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 

@@ -50,8 +50,24 @@ export class VitimaService {
 		if (!ocorrenciaId) throw new Error("ocorrenciaId é obrigatório");
 		return await VitimaRepository.find({
 			where: { ocorrencia: { id: ocorrenciaId } as any },
-			relations: ["ocorrencia"]
+			relations: ["ocorrencia", "lesao"]
 		});
+	}
+
+	// Atualiza uma vítima 
+	async updateVitima(id: number, data: any) {
+		const vitima = await VitimaRepository.findOneBy({ id });
+		if (!vitima) throw new Error("Vítima não encontrada");
+		const updatedVitima = { ...vitima, ...data };
+		return await VitimaRepository.save(updatedVitima);
+	}
+
+	// Deleta uma vítima
+	async deleteVitima(id: number) {
+		const vitima = await VitimaRepository.findOneBy({ id });
+		if (!vitima) throw new Error("Vítima não encontrada");
+		await VitimaRepository.delete(id);
+		return { message: "Vítima deletada com sucesso" };
 	}
 
 }

@@ -108,4 +108,21 @@ export class UserController {
       return res.status(400).json({ message: error.message ?? "Erro interno ao atualizar perfil." });
     }
   }
+
+  async salvarPushToken(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { pushToken } = req.body;
+
+      if (!pushToken) {
+        return res.status(400).json({ message: "pushToken é obrigatório." });
+      }
+
+      const updated = await userService.updatePushToken(Number(id), pushToken);
+      return res.status(200).json({ message: "Push token atualizado com sucesso.", user: updated });
+    } catch (error: any) {
+      console.error("Erro ao atualizar push token:", error);
+      return res.status(400).json({ message: error.message ?? "Erro interno ao atualizar push token." });
+    }
+  }
 }

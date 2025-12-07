@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { OcorrenciaUserController } from "../controllers/Ocorrencia_User.controller";
+import { checkPermission } from "../middlewares/checkPermission";
+import { auth } from "../middlewares/auth";
 
 const ocorrenciaUserRoutes = Router();
 
@@ -11,5 +13,12 @@ ocorrenciaUserRoutes.get("/ocorrencia/:id/users", controller.getUsersByOcorrenci
 
 // Lista todas as ocorrências de um usuário
 ocorrenciaUserRoutes.get("/user/:id/ocorrencias", controller.getOcorrenciasByUser);
+
+// Remove a relação de um usuário com uma ocorrência
+ocorrenciaUserRoutes.delete("/ocorrencia/:ocorrenciaId/user/:userId",
+    auth,
+    checkPermission(['ADMINISTRADOR', 'GESTOR', 'OPERADOR']),
+    (req, res) => controller.deleteUsersbyOcorrencia(req, res)
+);
 
 export { ocorrenciaUserRoutes };

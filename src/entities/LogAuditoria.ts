@@ -32,5 +32,6 @@ export class LogAuditoria {
     @JoinColumn({ name: "usuarioId" })
     usuario!: User;
 
+
 }
 

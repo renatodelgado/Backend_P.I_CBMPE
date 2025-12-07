@@ -11,11 +11,34 @@ import { Localizacao } from "../entities/Localizacao";
 import { SubgrupoOcorrenciaRepository } from "../repositories/SubgrupoOcorrencia.repository";
 import { AnexoRepository } from "../repositories/Anexo.repository";
 import { LogConflitoService } from "./LogConflito.service";
+import { auditService } from "./Audit.service";
+
+// Helper local para sanitizar objeto de ocorrência antes de gravar em log
+function sanitizeForAudit(obj: any) {
+    if (!obj) return obj;
+    const clone: any = {};
+    const forbidden = ['senha', 'password', 'token', 'secret', 'pushToken'];
+    for (const k of Object.keys(obj)) {
+        try {
+            const v = obj[k];
+            if (forbidden.some(f => k.toLowerCase().includes(f))) {
+                clone[k] = '[PROTECTED]';
+            } else if (v && typeof v === 'object') {
+                clone[k] = sanitizeForAudit(v);
+            } else {
+                clone[k] = v;
+            }
+        } catch (err) {
+            clone[k] = '[UNSERIALIZABLE]';
+        }
+    }
+    return clone;
+}
 
 export class OcorrenciaService {
 
-    // Criar uma ocorrência
-    async create(data: any) {
+        // Criar uma ocorrência
+    async create(data: any, auditContext?: { request_id?: string; actor_user_id?: string; actor_ip?: string; actor_user_agent?: string }) {
         // 🗺️ Localização
         let localizacao: Localizacao | undefined = undefined;
         if (data.localizacaoId) {
@@ -102,7 +125,24 @@ await AnexoRepository.save(anexos);
 
     }
 
-    return savedOcorrencia;
+        // grava auditoria centralizada via auditService
+        try {
+            await auditService.logEvent({
+                request_id: auditContext?.request_id,
+                event_type: 'ocorrencia_management',
+                actor: { user_id: auditContext?.actor_user_id ?? (savedOcorrencia.usuario?.id ? String(savedOcorrencia.usuario.id) : undefined), ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
+                action: 'create',
+                resource: 'Ocorrencia',
+                resource_id: String(savedOcorrencia.id),
+                outcome: 'success',
+                changes: { before: null, after: sanitizeForAudit(savedOcorrencia) },
+                metadata: { anexos_count: (savedOcorrencia as any).anexos?.length ?? 0 }
+            });
+        } catch (err) {
+            console.error('Erro ao gravar auditService (create ocorrencia):', err);
+        }
+
+        return savedOcorrencia;
 }
 
     // Buscar todas as ocorrências
@@ -162,7 +202,7 @@ await AnexoRepository.save(anexos);
     }
 
     // Atualizar uma ocorrência
-    async update(id: number, data: Partial<Ocorrencia>, userId?: number | null) {
+    async update(id: number, data: Partial<Ocorrencia>, userId?: number | null, auditContext?: { request_id?: string; actor_user_id?: string; actor_ip?: string; actor_user_agent?: string }) {
         const ocorrencia = await this.findById(id);
 
         
@@ -226,16 +266,53 @@ await AnexoRepository.save(anexos);
         }
 
         Object.assign(ocorrencia, data);
-        return await ocorrenciaRepository.save(ocorrencia);
+                const before = sanitizeForAudit(ocorrencia);
+                const saved = await ocorrenciaRepository.save(ocorrencia);
+
+                // grava auditoria de atualização via auditService
+                try {
+                    await auditService.logEvent({
+                        request_id: auditContext?.request_id,
+                        event_type: 'ocorrencia_management',
+                        actor: { user_id: auditContext?.actor_user_id ?? (userId ? String(userId) : undefined), ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
+                        action: 'update',
+                        resource: 'Ocorrencia',
+                        resource_id: String(saved.id),
+                        outcome: 'success',
+                        changes: { before, after: sanitizeForAudit(saved) },
+                        metadata: {}
+                    });
+                } catch (err) {
+                    console.error('Erro ao gravar auditService (update ocorrencia):', err);
+                }
+
+                return saved;
     }
 
     // Deletar ocorrência
-    async delete(id: number) {
+    async delete(id: number, auditContext?: { request_id?: string; actor_user_id?: string; actor_ip?: string; actor_user_agent?: string }) {
         const ocorrencia = await this.findById(id);
-        return await ocorrenciaRepository.remove(ocorrencia);
+                // grava auditoria de remoção via auditService
+                try {
+                    await auditService.logEvent({
+                        request_id: auditContext?.request_id,
+                        event_type: 'ocorrencia_management',
+                        actor: { user_id: auditContext?.actor_user_id, ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
+                        action: 'delete',
+                        resource: 'Ocorrencia',
+                        resource_id: String(ocorrencia.id),
+                        outcome: 'success',
+                        changes: { before: sanitizeForAudit(ocorrencia), after: null },
+                        metadata: {}
+                    });
+                } catch (err) {
+                    console.error('Erro ao gravar auditService (delete ocorrencia):', err);
+                }
+
+                return await ocorrenciaRepository.remove(ocorrencia);
     }
 
-    async updateStatus(id: number, status: string, user: { id: number; perfil: string; }) {
+    async updateStatus(id: number, status: string, user: { id: number; perfil: string; }, auditContext?: { request_id?: string; actor_user_id?: string; actor_ip?: string; actor_user_agent?: string }) {
         const allowedStatus = [
             "Pendentes",
             "Em andamento",
@@ -262,11 +339,35 @@ await AnexoRepository.save(anexos);
             throw new Error("Ocorrência não encontrada");
         }
 
-        ocorrencia.statusAtendimento = status;
+                const before = { statusAtendimento: ocorrencia.statusAtendimento };
+                ocorrencia.statusAtendimento = status;
 
-        const updatedOcorrencia = await ocorrenciaRepository.save(ocorrencia);
+                const updatedOcorrencia = await ocorrenciaRepository.save(ocorrencia);
 
-        return updatedOcorrencia;
+                // audit
+                try {
+                    await auditService.logEvent({
+                        request_id: auditContext?.request_id,
+                        event_type: 'ocorrencia_management',
+                        actor: { user_id: auditContext?.actor_user_id ?? (user?.id ? String(user.id) : undefined), ip: auditContext?.actor_ip, user_agent: auditContext?.actor_user_agent },
+                        action: 'update_status',
+                        resource: 'Ocorrencia',
+                        resource_id: String(id),
+                        outcome: 'success',
+                        changes: { before, after: { statusAtendimento: status } },
+                        metadata: {}
+                    });
+                } catch (err) {
+                    console.error('Erro ao gravar auditService (update_status):', err);
+                }
+
+                return updatedOcorrencia;
+    }
+
+    // Atualizar parte da ocorrência
+    async partialUpdate(id: number, data: Partial<Ocorrencia>, userId?: number | null) {
+        // Reutiliza o método update para atualização parcial
+        return this.update(id, data, userId);
     }
 
 }
