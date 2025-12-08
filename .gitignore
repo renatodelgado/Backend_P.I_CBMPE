@@ -17,3 +17,4 @@ yarn-error.log*
 
 #import para o banco de dados
 import-banco.ipynb
+test-db.ts
