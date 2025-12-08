@@ -18,7 +18,7 @@ export class UnidadeOperacional {
   sigla!: string;
 
   @ManyToOne(() => Regiao, { nullable: false })
-  @JoinColumn({name: "RegiaoId"})
+  @JoinColumn({name: "regiaoId"})
   regiao!: Regiao;
 
   @CreateDateColumn({ type: "timestamp" })
