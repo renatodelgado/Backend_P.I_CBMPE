@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, RelationId } from "typeorm";
 import { User } from "./User";
 
 @Entity({ name: "log_auditoria" })
@@ -31,6 +31,9 @@ export class LogAuditoria {
     @ManyToOne(() => User, { nullable: true, onDelete: "CASCADE" })
     @JoinColumn({ name: "usuarioId" })
     usuario!: User;
+
+    @RelationId((log: LogAuditoria) => log.usuario)
+    usuarioId?: number;
 
 
 }

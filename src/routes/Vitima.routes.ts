@@ -13,6 +13,11 @@ vitimaRoutes.patch("/:id",
     auth, 
     checkPermission(['ADMINISTRADOR', 'GESTOR', 'OPERADOR']),
     controller.updateVitima);
+
+vitimaRoutes.put("/:id",
+    auth, 
+    checkPermission(['ADMINISTRADOR', 'GESTOR', 'OPERADOR']),
+    controller.updateVitima);
     
 vitimaRoutes.delete("/:id",
     auth, 

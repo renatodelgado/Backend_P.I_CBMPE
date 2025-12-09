@@ -1,28 +1,21 @@
 import { LogAuditoria } from "../entities/LogAuditoria";
-import { getLogAuditoriaRepository } from "../repositories/LogAuditoria.repository";
+import { logAuditoriaRepository } from "../repositories/LogAuditoria.repository";
 
 export class LogAuditoriaService {
 
     async getAllLogs(): Promise<LogAuditoria[]> {
-        const repo = getLogAuditoriaRepository();
-        return await repo.find();
+        return await logAuditoriaRepository().find();
     }
 
     async getLogById(id: number): Promise<LogAuditoria | null> {
-        const repo = getLogAuditoriaRepository();
-        return await repo.findOneBy({ id });
+        return await logAuditoriaRepository().findOneBy({ id });
     }
 
     async createLog(logData: Partial<LogAuditoria>): Promise<LogAuditoria> {
-        const repo = getLogAuditoriaRepository();
-        const newLog = repo.create(logData as any);
-        return await repo.save(newLog as any);
+        const newLog = logAuditoriaRepository().create(logData);
+        return await logAuditoriaRepository().save(newLog);
     }
 
-    async getLogsByUserId(userId: number): Promise<LogAuditoria[]> {
-        const repo = getLogAuditoriaRepository();
-        return await repo.findBy({ usuario: { id: userId } } as any);
-    }
-    
+   
 
 }
