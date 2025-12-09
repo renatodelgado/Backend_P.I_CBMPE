@@ -9,7 +9,7 @@ const controller = new VitimaController();
 vitimaRoutes.post("/", controller.create);
 vitimaRoutes.get("/", controller.findAll);
 vitimaRoutes.get("/:ocorrenciaId", controller.findVitimasByOcorrenciaId);
-vitimaRoutes.patch("/:id",
+vitimaRoutes.put("/:id",
     auth, 
     checkPermission(['ADMINISTRADOR', 'GESTOR', 'OPERADOR']),
     controller.updateVitima);
