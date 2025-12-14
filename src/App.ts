@@ -22,6 +22,7 @@ import { ocorrenciaUserRoutes } from "./routes/Ocorrencia_User.routes";
 import logConflitoRoutes from "./routes/LogConflito.routes"; 
 import { anexoRoutes } from "./routes/Anexo.routes";
 import { logAuditoriaRoutes } from "./routes/LogAuditoria.routes";
+import previsaoRoutes from "./routes/previsaoRoutes";
 
 export const app = express();
 
@@ -75,3 +76,5 @@ app.use("/log-conflitos", logConflitoRoutes);
 app.use("/anexos", anexoRoutes);
 
 app.use("/audit", logAuditoriaRoutes);
+
+app.use("/api", previsaoRoutes);
